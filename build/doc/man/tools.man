@@ -1,0 +1,360 @@
+
+.IP 386asm
+Sets construction variables for the 386ASM assembler
+for the Phar Lap ETS embedded operating system.
+
+.IP aixc++
+Sets construction variables for the IMB xlc / Visual Age C++ compiler.
+
+.IP aixcc
+Sets construction variables for the IBM xlc / Visual Age C compiler.
+
+.IP aixf77
+Sets construction variables for the IBM Visual Age f77 Fortran compiler.
+
+.IP aixlink
+Sets construction variables for the IBM Visual Age linker.
+
+.IP applelink
+Sets construction variables for the Apple linker
+(similar to the GNU linker).
+
+.IP ar
+Sets construction variables for the &ar; library archiver.
+
+.IP as
+Sets construction variables for the &as; assembler.
+
+.IP bcc32
+Sets construction variables for the bcc32 compiler.
+
+.IP BitKeeper
+Sets construction variables for the BitKeeper
+source code control system.
+
+.IP cc
+Sets construction variables for generic POSIX C copmilers.
+
+.IP cvf
+Sets construction variables for the Compaq Visual Fortran compiler.
+
+.IP CVS
+Sets construction variables for the CVS source code
+management system.
+
+.IP cXX
+Sets construction variables for generic POSIX C++ compilers.
+
+.IP default
+Sets variables by calling a default list of Tool modules
+for the platform on which SCons is running.
+
+.IP dmd
+Sets construction variables for D language compilers
+(the Digital Mars D compiler, or GDC).
+
+.IP dvi
+Attaches the \fBDVI\fP() builder to the
+construction environment.
+
+.IP dvipdf
+Sets construction variables for the dvipdf utility.
+
+.IP dvips
+Sets construction variables for the dvips utility.
+
+.IP f77
+Set construction variables for generic POSIX Fortran 77 compilers.
+
+.IP f90
+Set construction variables for generic POSIX Fortran 90 compilers.
+
+.IP f95
+Set construction variables for generic POSIX Fortran 95 compilers.
+
+.IP fortran
+Set construction variables for generic POSIX Fortran compilers.
+
+.IP g++
+Set construction variables for the &gXX; C++ compiler.
+
+.IP g77
+Set construction variables for the &g77; Fortran compiler.
+Calls the &t-f77; Tool module
+to set variables.
+
+.IP gas
+Sets construction variables for the &gas; assembler.
+Calls the &t-as; module.
+
+.IP gcc
+Set construction variables for the &gcc; C compiler.
+
+.IP gettext
+This is actually a toolset, which supports internationalization and
+localization of sofware being constructed with SCons. The toolset loads
+following tools:
+
+<itemizedlist>
+  <listitem>    &t-link-xgettext; - to extract internationalized messages from source code to 
+    \fBPOT\fP file(s),
+  </para>  <listitem>    &t-link-msginit; - may be optionally used to initialize \fBPO\fP
+    files,
+  </para>  <listitem>    &t-link-msgmerge; - to update \fBPO\fP files, that already contain
+    translated messages,</para>  <listitem>    &t-link-msgfmt; - to compile textual \fBPO\fP file to binary
+    installable \fBMO\fP file.
+  </para></itemizedlist>
+
+When you enable &t-gettext;, it internally loads all abovementioned tools,
+so you're encouraged to see their individual documentation.
+
+Each of the above tools provides its own builder(s) which may be used to
+perform particular activities related to software internationalization. You
+may be however interested in \fItop-level\fP builder
+\fBTranslate\fP() described few paragraphs later.
+
+To use &t-gettext; tools add \fB'gettext'\fP tool to your
+environment:
+.ES
+  env = Environment( tools = ['default', 'gettext'] )
+.EE
+
+.IP gfortran
+Sets construction variables for the GNU F95/F2003 GNU compiler.
+
+.IP gnulink
+Set construction variables for GNU linker/loader.
+
+.IP gs
+Set construction variables for Ghostscript.
+
+.IP hpc++
+Set construction variables for the compilers aCC on HP/UX systems.
+
+.IP hpcc
+Set construction variables for the
+\fBaCC\fP on HP/UX systems.
+Calls the &t-cXX; tool for additional variables.
+
+.IP hplink
+Sets construction variables for the linker on HP/UX systems.
+
+.IP icc
+Sets construction variables for the
+\fBicc\fP compiler on OS/2 systems.
+
+.IP icl
+Sets construction variables for the Intel C/C++ compiler.
+Calls the &t-intelc; Tool module to set its variables.
+
+.IP ifl
+Sets construction variables for the Intel Fortran compiler.
+
+.IP ifort
+Sets construction variables for newer versions
+of the Intel Fortran compiler for Linux.
+
+.IP ilink
+Sets construction variables for the
+\fBilink\fP linker on OS/2 systems.
+
+.IP ilink32
+Sets construction variables for the Borland
+\fBilink32\fP linker.
+
+.IP install
+Sets construction variables for file
+and directory installation.
+
+.IP intelc
+Sets construction variables for the Intel C/C++ compiler
+(Linux and Windows, version 7 and later).
+Calls the &t-gcc; or &t-msvc;
+(on Linux and Windows, respectively)
+to set underlying variables.
+
+.IP jar
+Sets construction variables for the \fBjar\fP utility.
+
+.IP javac
+Sets construction variables for the &javac; compiler.
+
+.IP javah
+Sets construction variables for the &javah; tool.
+
+.IP latex
+Sets construction variables for the &latex; utility.
+
+.IP lex
+Sets construction variables for the &lex; lexical analyser.
+
+.IP link
+Sets construction variables for generic POSIX linkers.
+
+.IP linkloc
+Sets construction variables for the
+.B LinkLoc
+linker for the Phar Lap ETS embedded operating system.
+
+.IP m4
+Sets construction variables for the &m4; macro processor.
+
+.IP masm
+Sets construction variables for the Microsoft assembler.
+
+.IP midl
+Sets construction variables for the Microsoft IDL compiler.
+
+.IP mingw
+Sets construction variables for MinGW (Minimal Gnu on Windows).
+
+.IP msgfmt
+This scons tool is a part of scons &t-link-gettext; toolset. It provides scons
+interface to \fBmsgfmt(1)\fP command, which generates binary
+message catalog (\fBMO\fP) from a textual translation description
+.RB ( PO ).
+
+.IP msginit
+This scons tool is a part of scons &t-link-gettext; toolset. It provides
+scons interface to \fBmsginit(1)\fP program, which creates new
+\fBPO\fP file, initializing the meta information with values from
+user's environment (or options).
+
+.IP msgmerge
+This scons tool is a part of scons &t-link-gettext; toolset. It provides
+scons interface to \fBmsgmerge(1)\fP command, which merges two
+Uniform style \fB.po\fP files together. 
+
+.IP mslib
+Sets construction variables for the Microsoft
+.B mslib
+library archiver.
+
+.IP mslink
+Sets construction variables for the Microsoft linker.
+
+.IP mssdk
+Sets variables for Microsoft Platform SDK and/or Windows SDK.
+Note that unlike most other Tool modules,
+mssdk does not set construction variables,
+but sets the \fIenvironment variables\fP
+in the environment &SCons; uses to execute
+the Microsoft toolchain:
+.BR %INCLUDE% ,
+.BR %LIB% ,
+\fB%LIBPATH%\fP and
+.BR %PATH% .
+
+.IP msvc
+Sets construction variables for the Microsoft Visual C/C++ compiler.
+
+.IP msvs
+Sets construction variables for Microsoft Visual Studio.
+
+.IP mwcc
+Sets construction variables for the Metrowerks CodeWarrior compiler.
+
+.IP mwld
+Sets construction variables for the Metrowerks CodeWarrior linker.
+
+.IP nasm
+Sets construction variables for the
+\fBnasm\fP Netwide Assembler.
+
+.IP Packaging
+Sets construction variables for the \fBPackage\fP() Builder.
+
+.IP packaging
+A framework for building binary and source packages.
+
+.IP pdf
+Sets construction variables for the Portable Document Format builder.
+
+.IP pdflatex
+Sets construction variables for the &pdflatex; utility.
+
+.IP pdftex
+Sets construction variables for the &pdftex; utility.
+
+.IP Perforce
+Sets construction variables for interacting with the
+Perforce source code management system.
+
+.IP qt
+Sets construction variables for building Qt applications.
+
+.IP RCS
+Sets construction variables for the interaction
+with the Revision Control System.
+
+.IP rmic
+Sets construction variables for the &rmic; utility.
+
+.IP rpcgen
+Sets construction variables for building with RPCGEN.
+
+.IP SCCS
+Sets construction variables for interacting with the
+Source Code Control System.
+
+.IP sgiar
+Sets construction variables for the SGI library archiver.
+
+.IP sgic++
+Sets construction variables for the SGI C++ compiler.
+
+.IP sgicc
+Sets construction variables for the SGI C compiler.
+
+.IP sgilink
+Sets construction variables for the SGI linker.
+
+.IP sunar
+Sets construction variables for the Sun library archiver.
+
+.IP sunc++
+Sets construction variables for the Sun C++ compiler.
+
+.IP suncc
+Sets construction variables for the Sun C compiler.
+
+.IP sunf77
+Set construction variables for the Sun &f77; Fortran compiler.
+
+.IP sunf90
+Set construction variables for the Sun &f90; Fortran compiler.
+
+.IP sunf95
+Set construction variables for the Sun &f95; Fortran compiler.
+
+.IP sunlink
+Sets construction variables for the Sun linker.
+
+.IP swig
+Sets construction variables for the SWIG interface generator.
+
+.IP tar
+Sets construction variables for the &tar; archiver.
+
+.IP tex
+Sets construction variables for the TeX formatter and typesetter.
+
+.IP textfile
+Set construction variables for the \fBTextfile\fP() and \fBSubstfile\fP() builders.
+
+.IP tlib
+Sets construction variables for the Borlan
+\fBtib\fP library archiver.
+
+.IP xgettext
+This scons tool is a part of scons &t-link-gettext; toolset. It provides
+scons interface to \fBxgettext(1)\fP
+program, which extracts internationalized messages from source code. The tool
+provides \fBPOTUpdate\fP() builder to make  \fBPO\fP
+\fITemplate\fP files. 
+
+.IP yacc
+Sets construction variables for the &yacc; parse generator.
+
+.IP zip
+Sets construction variables for the &zip; archiver.

@@ -1,0 +1,1717 @@
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP CFile()
+.IP env.CFile()
+Builds a C source file given a lex (\fB.l\fP)
+or yacc (\fB.y\fP) input file.
+The suffix specified by the \fB$CFILESUFFIX\fP construction variable
+(\fB.c\fP by default)
+is automatically added to the target
+if it is not already present.
+Example:
+
+.ES
+# builds foo.c
+env.CFile(target = 'foo.c', source = 'foo.l')
+# builds bar.c
+env.CFile(target = 'bar', source = 'bar.y')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Command()
+.IP env.Command()
+The \fBCommand\fP() "Builder" is actually implemented
+as a function that looks like a Builder,
+but actually takes an additional argument of the action
+from which the Builder should be made.
+See the \fBCommand\fP() function description
+for the calling syntax and details.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP CXXFile()
+.IP env.CXXFile()
+Builds a C++ source file given a lex (\fB.ll\fP)
+or yacc (\fB.yy\fP)
+input file.
+The suffix specified by the \fB$CXXFILESUFFIX\fP construction variable
+(\fB.cc\fP by default)
+is automatically added to the target
+if it is not already present.
+Example:
+
+.ES
+# builds foo.cc
+env.CXXFile(target = 'foo.cc', source = 'foo.ll')
+# builds bar.cc
+env.CXXFile(target = 'bar', source = 'bar.yy')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP DVI()
+.IP env.DVI()
+Builds a \fB.dvi\fP file
+from a \fB.tex\fP,
+\fB.ltx\fP or \fB.latex\fP input file.
+If the source file suffix is \fB.tex\fP,
+.B scons
+will examine the contents of the file;
+if the string
+.B \\documentclass
+or
+.B \\documentstyle
+is found, the file is assumed to be a LaTeX file and
+the target is built by invoking the \fB$LATEXCOM\fP command line;
+otherwise, the \fB$TEXCOM\fP command line is used.
+If the file is a LaTeX file,
+the
+.BR DVI ()
+builder method will also examine the contents
+of the
+.B .aux
+file and invoke the \fB$BIBTEX\fP command line
+if the string
+.B bibdata
+is found,
+start \fB$MAKEINDEX\fP to generate an index if a
+.B .ind
+file is found
+and will examine the contents
+.B .log
+file and re-run the \fB$LATEXCOM\fP command
+if the log file says it is necessary.
+
+The suffix \fB.dvi\fP
+(hard-coded within TeX itself)
+is automatically added to the target
+if it is not already present.
+Examples:
+
+.ES
+# builds from aaa.tex
+env.DVI(target = 'aaa.dvi', source = 'aaa.tex')
+# builds bbb.dvi
+env.DVI(target = 'bbb', source = 'bbb.ltx')
+# builds from ccc.latex
+env.DVI(target = 'ccc.dvi', source = 'ccc.latex')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Install()
+.IP env.Install()
+Installs one or more source files or directories
+in the specified target,
+which must be a directory.
+The names of the specified source files or directories
+remain the same within the destination directory. The
+sources may be given as a string or as a node returned by
+a builder.
+
+.ES
+env.Install('/usr/local/bin', source = ['foo', 'bar'])
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP InstallAs()
+.IP env.InstallAs()
+Installs one or more source files or directories
+to specific names,
+allowing changing a file or directory name
+as part of the installation.
+It is an error if the
+target
+and
+source
+arguments list different numbers of files or directories.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP InstallVersionedLib()
+.IP env.InstallVersionedLib()
+Installs a versioned shared library. The \fB$SHLIBVERSION\fP
+construction variable should be defined in the environment
+to confirm the version number in the library name.
+The symlinks appropriate to the architecture will be generated.
+
+.ES
+env.InstallAs(target = '/usr/local/bin/foo',
+              source = 'foo_debug')
+env.InstallAs(target = ['../lib/libfoo.a', '../lib/libbar.a'],
+              source = ['libFOO.a', 'libBAR.a'])
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Jar()
+.IP env.Jar()
+Builds a Java archive (\fB.jar\fP) file
+from the specified list of sources.
+Any directories in the source list
+will be searched for \fB.class\fP files).
+Any \fB.java\fP files in the source list
+will be compiled  to \fB.class\fP files
+by calling the \fBJava\fP() Builder.
+
+If the \fB$JARCHDIR\fP value is set, the
+.B jar
+command will change to the specified directory using the
+.B \-C
+option.
+If \fB$JARCHDIR\fP is not set explicitly,
+&SCons; will use the top of any subdirectory tree
+in which Java \fB.class\fP
+were built by the \fBJava\fP() Builder.
+
+If the contents any of the source files begin with the string
+.BR Manifest-Version ,
+the file is assumed to be a manifest
+and is passed to the
+.B jar
+command with the
+.B m
+option set.
+
+.ES
+env.Jar(target = 'foo.jar', source = 'classes')
+
+env.Jar(target = 'bar.jar',
+        source = ['bar1.java', 'bar2.java'])
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Java()
+.IP env.Java()
+Builds one or more Java class files.
+The sources may be any combination of explicit
+\fB.java\fP files,
+or directory trees which will be scanned
+for \fB.java\fP files.
+
+SCons will parse each source \fB.java\fP file
+to find the classes
+(including inner classes)
+defined within that file,
+and from that figure out the
+target \fB.class\fP files that will be created.
+The class files will be placed underneath
+the specified target directory.
+
+SCons will also search each Java file
+for the Java package name,
+which it assumes can be found on a line
+beginning with the string
+.B package
+in the first column;
+the resulting \fB.class\fP files
+will be placed in a directory reflecting
+the specified package name.
+For example,
+the file
+.B Foo.java
+defining a single public
+.I Foo
+class and
+containing a package name of
+.I sub.dir
+will generate a corresponding
+.B sub/dir/Foo.class
+class file.
+
+Examples:
+
+.ES
+env.Java(target = 'classes', source = 'src')
+env.Java(target = 'classes', source = ['src1', 'src2'])
+env.Java(target = 'classes', source = ['File1.java', 'File2.java'])
+.EE
+.IP
+Java source files can use the native encoding for the underlying OS.
+Since SCons compiles in simple ASCII mode by default,
+the compiler will generate warnings about unmappable characters,
+which may lead to errors as the file is processed further.
+In this case, the user must specify the \fBLANG\fP
+environment variable to tell the compiler what encoding is used.
+For portibility, it's best if the encoding is hard-coded
+so that the compile will work if it is done on a system
+with a different encoding.
+
+.ES
+env = Environment()
+env['ENV']['LANG'] = 'en_GB.UTF-8'
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP JavaH()
+.IP env.JavaH()
+Builds C header and source files for
+implementing Java native methods.
+The target can be either a directory
+in which the header files will be written,
+or a header file name which
+will contain all of the definitions.
+The source can be the names of \fB.class\fP files,
+the names of \fB.java\fP files
+to be compiled into \fB.class\fP files
+by calling the \fBJava\fP() builder method,
+or the objects returned from the
+.BR Java ()
+builder method.
+
+If the construction variable
+.B $JAVACLASSDIR
+is set, either in the environment
+or in the call to the
+.BR JavaH ()
+builder method itself,
+then the value of the variable
+will be stripped from the
+beginning of any \fB.class\fP file names.
+
+Examples:
+
+.ES
+# builds java_native.h
+classes = env.Java(target = 'classdir', source = 'src')
+env.JavaH(target = 'java_native.h', source = classes)
+
+# builds include/package_foo.h and include/package_bar.h
+env.JavaH(target = 'include',
+          source = ['package/foo.class', 'package/bar.class'])
+
+# builds export/foo.h and export/bar.h
+env.JavaH(target = 'export',
+          source = ['classes/foo.class', 'classes/bar.class'],
+          JAVACLASSDIR = 'classes')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Library()
+.IP env.Library()
+A synonym for the
+.BR StaticLibrary ()
+builder method.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP LoadableModule()
+.IP env.LoadableModule()
+On most systems,
+this is the same as
+.BR SharedLibrary ().
+On Mac OS X (Darwin) platforms,
+this creates a loadable module bundle.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP M4()
+.IP env.M4()
+Builds an output file from an M4 input file.
+This uses a default \fB$M4FLAGS\fP value of
+.BR \-E ,
+which considers all warnings to be fatal
+and stops on the first warning
+when using the GNU version of m4.
+Example:
+
+.ES
+env.M4(target = 'foo.c', source = 'foo.c.m4')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Moc()
+.IP env.Moc()
+Builds an output file from a moc input file. Moc input files are either
+header files or cxx files. This builder is only available after using the
+tool 'qt'. See the \fB$QTDIR\fP variable for more information.
+Example:
+
+.ES
+env.Moc('foo.h') # generates moc_foo.cc
+env.Moc('foo.cpp') # generates foo.moc
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP MOFiles()
+.IP env.MOFiles()
+This builder belongs to &t-link-msgfmt; tool. The builder compiles
+\fBPO\fP files to \fBMO\fP files.
+
+.IR Example 1 .
+Create \fBpl.mo\fP and \fBen.mo\fP by compiling
+.BR pl.po\fP and \fBen.po :
+.ES
+  # ...
+  env.MOFiles(['pl', 'en'])
+.EE
+.IP
+.IR Example 2 .
+Compile files for languages defined in \fBLINGUAS\fP file:
+.ES
+  # ...
+  env.MOFiles(LINGUAS_FILE = 1)
+.EE
+.IP
+.IR Example 3 .
+Create \fBpl.mo\fP and \fBen.mo\fP by compiling
+\fBpl.po\fP and \fBen.po\fP plus files for
+languages defined in \fBLINGUAS\fP file:
+.ES
+  # ...
+  env.MOFiles(['pl', 'en'], LINGUAS_FILE = 1)
+.EE
+.IP
+.IR Example 4 .
+Compile files for languages defined in \fBLINGUAS\fP file 
+(another version):
+.ES
+  # ...
+  env['LINGUAS_FILE'] = 1
+  env.MOFiles()
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP MSVSProject()
+.IP env.MSVSProject()
+Builds a Microsoft Visual Studio project file,
+and by default builds a solution file as well.
+
+This builds a Visual Studio project file, based on the version of
+Visual Studio that is configured (either the latest installed version,
+or the version specified by
+.B $MSVS_VERSION
+in the Environment constructor).
+For Visual Studio 6, it will generate a
+.B .dsp
+file.
+For Visual Studio 7 (.NET) and later versions, it will generate a
+.B .vcproj
+file.
+
+By default,
+this also generates a solution file
+for the specified project,
+a
+.B .dsw
+file for Visual Studio 6
+or a
+.B .sln
+file for Visual Studio 7 (.NET).
+This behavior may be disabled by specifying
+.B auto_build_solution=0
+when you call
+.BR MSVSProject (),
+in which case you presumably want to
+build the solution file(s)
+by calling the
+.BR MSVSSolution ()
+Builder (see below).
+
+The \fBMSVSProject\fP() builder
+takes several lists of filenames
+to be placed into the project file.
+These are currently limited to
+.BR srcs ,
+.BR incs ,
+.BR localincs ,
+.BR resources ,
+and
+.BR misc .
+These are pretty self-explanatory, but it should be noted that these
+lists are added to the \fB$SOURCES\fP construction variable as strings,
+NOT as SCons File Nodes.  This is because they represent file
+names to be added to the project file, not the source files used to
+build the project file.
+
+The above filename lists are all optional,
+although at least one must be specified
+for the resulting project file to be non-empty.
+
+In addition to the above lists of values,
+the following values may be specified:
+
+.BR target :
+The name of the target
+.B .dsp
+or
+.B .vcproj
+file.
+The correct
+suffix for the version of Visual Studio must be used,
+but the
+.B $MSVSPROJECTSUFFIX
+construction variable
+will be defined to the correct value (see example below).
+
+.BR variant :
+The name of this particular variant.
+For Visual Studio 7 projects,
+this can also be a list of variant names.
+These are typically things like "Debug" or "Release", but really
+can be anything you want.
+For Visual Studio 7 projects,
+they may also specify a target platform
+separated from the variant name by a
+.B |
+(vertical pipe)
+character:
+.BR Debug|Xbox .
+The default target platform is Win32.
+Multiple calls to
+.BR MSVSProject ()
+with different variants are allowed;
+all variants will be added to the project file with their appropriate
+build targets and sources.
+
+.BR buildtarget :
+An optional string, node, or list of strings or nodes
+(one per build variant), to tell the Visual Studio debugger
+what output target to use in what build variant.
+The number of
+.B buildtarget
+entries must match the number of
+.B variant
+entries.
+
+.BR runfile :
+The name of the file that Visual Studio 7 and later
+will run and debug.
+This appears as the value of the
+.B Output
+field in the resutling Visual Studio project file.
+If this is not specified,
+the default is the same as the specified
+.B buildtarget
+value.
+
+Note that because &SCons; always executes its build commands
+from the directory in which the \fBSConstruct\fP file is located,
+if you generate a project file in a different directory
+than the \fBSConstruct\fP directory,
+users will not be able to double-click
+on the file name in compilation error messages
+displayed in the Visual Studio console output window.
+This can be remedied by adding the
+Visual C/C++
+.B /FC
+compiler option to the \fB$CCFLAGS\fP  variable
+so that the compiler will print
+the full path name of any
+files that cause compilation errors.
+
+Example usage:
+
+.ES
+barsrcs = ['bar.cpp'],
+barincs = ['bar.h'],
+barlocalincs = ['StdAfx.h']
+barresources = ['bar.rc','resource.h']
+barmisc = ['bar_readme.txt']
+
+dll = env.SharedLibrary(target = 'bar.dll',
+                        source = barsrcs)
+
+env.MSVSProject(target = 'Bar' + env['MSVSPROJECTSUFFIX'],
+                srcs = barsrcs,
+                incs = barincs,
+                localincs = barlocalincs,
+                resources = barresources,
+                misc = barmisc,
+                buildtarget = dll,
+                variant = 'Release')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP MSVSSolution()
+.IP env.MSVSSolution()
+Builds a Microsoft Visual Studio solution file.
+
+This builds a Visual Studio solution file,
+based on the version of Visual Studio that is configured
+(either the latest installed version,
+or the version specified by
+.B $MSVS_VERSION
+in the construction environment).
+For Visual Studio 6, it will generate a
+.B .dsw
+file.
+For Visual Studio 7 (.NET), it will
+generate a
+.B .sln
+file.
+
+The following values must be specified:
+
+.BR target :
+The name of the target .dsw or .sln file.  The correct
+suffix for the version of Visual Studio must be used, but the value
+.B $MSVSSOLUTIONSUFFIX
+will be defined to the correct value (see example below).
+
+.BR variant :
+The name of this particular variant, or a list of variant
+names (the latter is only supported for MSVS 7 solutions). These are
+typically things like "Debug" or "Release", but really can be anything
+you want. For MSVS 7 they may also specify target platform, like this
+"Debug|Xbox". Default platform is Win32.
+
+.BR projects :
+A list of project file names, or Project nodes returned by calls to the
+.BR MSVSProject ()
+Builder,
+to be placed into the solution file.
+It should be noted that these file names are NOT added to the $SOURCES
+environment variable in form of files, but rather as strings.   This
+is because they represent file names to be added to the solution file,
+not the source files used to build the solution file.
+
+Example Usage:
+
+.ES
+env.MSVSSolution(target = 'Bar' + env['MSVSSOLUTIONSUFFIX'],
+                 projects = ['bar' + env['MSVSPROJECTSUFFIX']],
+                 variant = 'Release')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Object()
+.IP env.Object()
+A synonym for the
+.BR StaticObject ()
+builder method.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Package()
+.IP env.Package()
+Builds software distribution packages.
+Packages consist of files to install and packaging information.
+The former may be specified with the \fIsource\fP parameter and may be left out,
+in which case the &FindInstalledFiles; function will collect
+all files that have an \fBInstall\fP() or \fBInstallAs\fP() Builder attached.
+If the \fItarget\fP is not specified
+it will be deduced from additional information given to this Builder.
+
+The packaging information is specified
+with the help of construction variables documented below.
+This information is called a tag to stress that
+some of them can also be attached to files with the &Tag; function.
+The mandatory ones will complain if they were not specified.
+They vary depending on chosen target packager.
+
+The target packager may be selected with the "PACKAGETYPE" command line
+option or with the \fB$PACKAGETYPE\fP construction variable. Currently
+the following packagers available:
+
+ * msi - Microsoft Installer
+ * rpm - Redhat Package Manger
+ * ipkg - Itsy Package Management System
+ * tarbz2 - compressed tar
+ * targz - compressed tar
+ * zip - zip file
+ * src_tarbz2 - compressed tar source
+ * src_targz - compressed tar source
+ * src_zip - zip file source
+
+An updated list is always available under the "package_type" option when
+running "scons --help" on a project that has packaging activated.
+.ES
+env = Environment(tools=['default', 'packaging'])
+env.Install('/bin/', 'my_program')
+env.Package( NAME           = 'foo',
+             VERSION        = '1.2.3',
+             PACKAGEVERSION = 0,
+             PACKAGETYPE    = 'rpm',
+             LICENSE        = 'gpl',
+             SUMMARY        = 'balalalalal',
+             DESCRIPTION    = 'this should be really really long',
+             X_RPM_GROUP    = 'Application/fu',
+             SOURCE_URL     = 'http://foo.org/foo-1.2.3.tar.gz'
+        )
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP PCH()
+.IP env.PCH()
+Builds a Microsoft Visual C++ precompiled header.
+Calling this builder method
+returns a list of two targets: the PCH as the first element, and the object
+file as the second element. Normally the object file is ignored.
+This builder method is only
+provided when Microsoft Visual C++ is being used as the compiler.
+The PCH builder method is generally used in
+conjuction with the PCH construction variable to force object files to use
+the precompiled header:
+
+.ES
+env['PCH'] = env.PCH('StdAfx.cpp')[0]
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP PDF()
+.IP env.PDF()
+Builds a \fB.pdf\fP file
+from a \fB.dvi\fP input file
+(or, by extension, a \fB.tex\fP,
+.BR .ltx ,
+or
+\fB.latex\fP input file).
+The suffix specified by the \fB$PDFSUFFIX\fP construction variable
+(\fB.pdf\fP by default)
+is added automatically to the target
+if it is not already present.  Example:
+
+.ES
+# builds from aaa.tex
+env.PDF(target = 'aaa.pdf', source = 'aaa.tex')
+# builds bbb.pdf from bbb.dvi
+env.PDF(target = 'bbb', source = 'bbb.dvi')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP POInit()
+.IP env.POInit()
+This builder belongs to &t-link-msginit; tool. The builder initializes missing
+\fBPO\fP file(s) if \fB$POAUTOINIT\fP is set.  If
+\fB$POAUTOINIT\fP is not set (default), \fBPOInit\fP() prints instruction for
+user (that is supposed to be a translator), telling how the
+\fBPO\fP file should be initialized. In normal projects
+.IR you should not use \fBPOInit\fP() and use \fBPOUpdate ()
+instead\fP. \fBPOUpdate\fP() chooses intelligently between
+.BR msgmerge(1)\fP and \fBmsginit(1)\fP. \fBPOInit ()
+always uses \fBmsginit(1)\fP and should be regarded as builder for
+special purposes or for temporary use (e.g. for quick, one time initialization
+of a bunch of \fBPO\fP files) or for tests.
+
+Target nodes defined through \fBPOInit\fP() are not built by default (they're
+\fBIgnore\fPd from \fB'.'\fP node) but are added to
+special \fBAlias\fP (\fB'po-create'\fP by default).
+The alias name may be changed through the \fB$POCREATE_ALIAS\fP
+construction variable. All \fBPO\fP files defined through
+.BR POInit\fP() may be easily initialized by \fBscons po-create .
+
+.IR Example 1 .
+Initialize \fBen.po\fP and \fBpl.po\fP from
+.BR messages.pot :
+.ES
+  # ...
+  env.POInit(['en', 'pl']) # messages.pot --> [en.po, pl.po] 
+.EE
+.IP
+.IR Example 2 .
+Initialize \fBen.po\fP and \fBpl.po\fP from
+.BR foo.pot :
+.ES
+  # ...
+  env.POInit(['en', 'pl'], ['foo']) # foo.pot --> [en.po, pl.po] 
+.EE
+.IP
+.IR Example 3 .
+Initialize \fBen.po\fP and \fBpl.po\fP from
+\fBfoo.pot\fP but using \fB$POTDOMAIN\fP construction
+variable:
+.ES
+  # ...
+  env.POInit(['en', 'pl'], POTDOMAIN='foo') # foo.pot --> [en.po, pl.po] 
+.EE
+.IP
+.IR Example 4 .
+Initialize \fBPO\fP files for languages defined in
+\fBLINGUAS\fP file. The files will be initialized from template
+.BR messages.pot :
+.ES
+  # ...
+  env.POInit(LINGUAS_FILE = 1) # needs 'LINGUAS' file
+.EE
+.IP
+.IR Example 5 .
+Initialize \fBen.po\fP and \fBpl.pl\fP
+\fBPO\fP files plus files for languages defined in
+\fBLINGUAS\fP file. The files will be initialized from template
+.BR messages.pot :
+.ES
+  # ...
+  env.POInit(['en', 'pl'], LINGUAS_FILE = 1)
+.EE
+.IP
+.IR Example 6 .
+You may preconfigure your environment first, and then initialize
+\fBPO\fP files:
+.ES
+  # ...
+  env['POAUTOINIT'] = 1
+  env['LINGUAS_FILE'] = 1
+  env['POTDOMAIN'] = 'foo'
+  env.POInit()
+.EE
+which has same efect as:
+.ES
+  # ...
+  env.POInit(POAUTOINIT = 1, LINGUAS_FILE = 1, POTDOMAIN = 'foo')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP PostScript()
+.IP env.PostScript()
+Builds a \fB.ps\fP file
+from a \fB.dvi\fP input file
+(or, by extension, a \fB.tex\fP,
+.BR .ltx ,
+or
+\fB.latex\fP input file).
+The suffix specified by the \fB$PSSUFFIX\fP construction variable
+(\fB.ps\fP by default)
+is added automatically to the target
+if it is not already present.  Example:
+
+.ES
+# builds from aaa.tex
+env.PostScript(target = 'aaa.ps', source = 'aaa.tex')
+# builds bbb.ps from bbb.dvi
+env.PostScript(target = 'bbb', source = 'bbb.dvi')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP POTUpdate()
+.IP env.POTUpdate()
+The builder belongs to &t-link-xgettext; tool. The builder updates target
+\fBPOT\fP file if exists or creates one if it doesn't. The node is
+not built by default (i.e. it is \fBIgnore\fPd from
+\fB'.'\fP), but only on demand (i.e.  when given
+\fBPOT\fP file is required or when special alias is invoked). This
+builder adds its targe node (\fBmessages.pot\fP, say) to a
+special alias (\fBpot-update\fP by default, see
+\fB$POTUPDATE_ALIAS\fP) so you can update/create them easily with
+\fBscons pot-update\fP. The file is not written until there is no
+real change in internationalized messages (or in comments that enter
+\fBPOT\fP file). 
+
+<note> 
+You may see \fBxgettext(1)\fP being invoked by the
+&t-link-xgettext; tool even if there is no real change in internationalized
+messages (so the \fBPOT\fP file is not being updated).  This
+happens every time  a source file has changed. In such case we invoke
+\fBxgettext(1)\fP and compare its output with the content of
+\fBPOT\fP file to decide whether the file should be updated or
+not.</para></note>
+
+.I "Example 1."
+Let's create \fBpo/\fP directory and place following
+\fBSConstruct\fP script there:
+.ES
+  # SConstruct in 'po/' subdir
+  env = Environment( tools = ['default', 'xgettext'] )
+  env.POTUpdate(['foo'], ['../a.cpp', '../b.cpp'])
+  env.POTUpdate(['bar'], ['../c.cpp', '../d.cpp'])
+.EE
+.IP
+      
+Then invoke scons few times:
+.ES
+  user@host:$ scons             # Does not create foo.pot nor bar.pot
+  user@host:$ scons foo.pot     # Updates or creates foo.pot
+  user@host:$ scons pot-update  # Updates or creates foo.pot and bar.pot
+  user@host:$ scons -c          # Does not clean foo.pot nor bar.pot.
+.EE
+the results shall be as the comments above say.
+
+.I "Example 2."
+The \fBPOTUpdate\fP() builder may be used with no target specified, in which
+case default target \fBmessages.pot\fP will be used. The
+default target may also be overriden by setting \fB$POTDOMAIN\fP construction
+variable or providing it as an override to \fBPOTUpdate\fP() builder:
+.ES    
+  # SConstruct script
+  env = Environment( tools = ['default', 'xgettext'] )
+  env['POTDOMAIN'] = "foo"
+  env.POTUpdate(source = ["a.cpp", "b.cpp"]) # Creates foo.pot ...
+  env.POTUpdate(POTDOMAIN = "bar", source = ["c.cpp", "d.cpp"]) # and bar.pot
+.EE
+.IP
+.I "Example 3."
+The sources may be specified within separate file, for example
+.BR POTFILES.in :
+.ES      
+  # POTFILES.in in 'po/' subdirectory
+  ../a.cpp
+  ../b.cpp
+  # end of file
+.EE
+.IP
+    
+The name of the file (\fBPOTFILES.in\fP) containing the list of
+sources is provided via \fB$XGETTEXTFROM\fP:
+.ES      
+  # SConstruct file in 'po/' subdirectory
+  env = Environment( tools = ['default', 'xgettext'] )
+  env.POTUpdate(XGETTEXTFROM = 'POTFILES.in')
+.EE
+.IP
+    
+
+.I "Example 4."
+You may use \fB$XGETTEXTPATH\fP to define source search path. Assume, for
+example, that you have files \fBa.cpp\fP,
+.BR b.cpp\fP, \fBpo/SConstruct ,
+.BR po/POTFILES.in\fP. Then your \fBPOT -related
+files could look as below:
+.ES
+  # POTFILES.in in 'po/' subdirectory
+  a.cpp
+  b.cpp
+  # end of file
+.EE
+
+.ES
+  # SConstruct file in 'po/' subdirectory
+  env = Environment( tools = ['default', 'xgettext'] )
+  env.POTUpdate(XGETTEXTFROM = 'POTFILES.in', XGETTEXTPATH='../')
+.EE
+.IP
+.I "Example 5."
+Multiple search directories may be defined within a list, i.e.
+\fBXGETTEXTPATH = ['dir1', 'dir2', ...]\fP. The order in the list
+determines the search order of source files. The path to the first file found
+is used.
+
+Let's create \fB0/1/po/SConstruct\fP script:
+.ES
+  # SConstruct file in '0/1/po/' subdirectory
+  env = Environment( tools = ['default', 'xgettext'] )
+  env.POTUpdate(XGETTEXTFROM = 'POTFILES.in', XGETTEXTPATH=['../', '../../'])
+.EE
+and \fB0/1/po/POTFILES.in\fP:
+.ES
+  # POTFILES.in in '0/1/po/' subdirectory
+  a.cpp
+  # end of file
+.EE
+Write two \fB*.cpp\fP files, the first one is
+.BR 0/a.cpp :
+.ES
+  /* 0/a.cpp */
+  gettext("Hello from ../../a.cpp")
+.EE
+and the second is \fB0/1/a.cpp\fP:
+.ES
+  /* 0/1/a.cpp */
+  gettext("Hello from ../a.cpp")
+.EE
+then run scons. You'll obtain \fB0/1/po/messages.pot\fP with the
+message \fB"Hello from ../a.cpp"\fP. When you reverse order in
+\fI$XGETTEXTFOM\fP, i.e. when you write SConscript as
+.ES
+  # SConstruct file in '0/1/po/' subdirectory
+  env = Environment( tools = ['default', 'xgettext'] )
+  env.POTUpdate(XGETTEXTFROM = 'POTFILES.in', XGETTEXTPATH=['../../', '../'])
+.EE
+.IP
+ then the \fBmessages.pot\fP will contain
+\fBmsgid "Hello from ../../a.cpp"\fP line and not 
+.BR msgid "Hello from ../a.cpp" .
+
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP POUpdate()
+.IP env.POUpdate()
+The builder belongs to &t-link-msgmerge; tool. The builder updates
+\fBPO\fP files with \fBmsgmerge(1)\fP, or initializes
+missing \fBPO\fP files as described in documentation of
+&t-link-msginit; tool and \fBPOInit\fP() builder (see also
+\fB$POAUTOINIT\fP). Note, that \fBPOUpdate\fP() \fIdoes not add its
+targets to \fBpo-create\fP alias\fP as \fBPOInit\fP()
+does.
+
+Target nodes defined through \fBPOUpdate\fP() are not built by default
+(they're \fBIgnore\fPd from \fB'.'\fP node). Instead,
+they are added automatically to special \fBAlias\fP 
+(\fB'po-update'\fP by default). The alias name may be changed
+through the \fB$POUPDATE_ALIAS\fP construction variable.  You can easilly 
+update \fBPO\fP files in your project by \fBscons
+po-update\fP.
+
+.I "Example 1."
+Update \fBen.po\fP and \fBpl.po\fP from
+.BR messages.pot\fP template (see also \fB$POTDOMAIN ),
+assuming that the later one exists or there is rule to build it (see
+.BR POTUpdate ()):
+.ES
+  # ...
+  env.POUpdate(['en','pl']) # messages.pot --> [en.po, pl.po]
+.EE
+.IP
+.I "Example 2."
+Update \fBen.po\fP and \fBpl.po\fP from
+\fBfoo.pot\fP template:
+.ES
+  # ...
+  env.POUpdate(['en', 'pl'], ['foo']) # foo.pot -->  [en.po, pl.pl]
+.EE
+.IP
+.I "Example 3."
+Update \fBen.po\fP and \fBpl.po\fP from
+\fBfoo.pot\fP (another version):
+.ES
+  # ...
+  env.POUpdate(['en', 'pl'], POTDOMAIN='foo') # foo.pot -- > [en.po, pl.pl]
+.EE
+.IP
+.I "Example 4."
+Update files for languages defined in \fBLINGUAS\fP file. The
+files are updated from \fBmessages.pot\fP template:
+.ES
+  # ...
+  env.POUpdate(LINGUAS_FILE = 1) # needs 'LINGUAS' file
+.EE
+.IP
+.I "Example 5."
+Same as above, but update from \fBfoo.pot\fP template:
+.ES
+  # ...
+  env.POUpdate(LINGUAS_FILE = 1, source = ['foo'])
+.EE
+.IP
+.I "Example 6."
+Update \fBen.po\fP and \fBpl.po\fP plus files for
+languages defined in \fBLINGUAS\fP file. The files are updated
+from \fBmessages.pot\fP template:
+.ES
+  # produce 'en.po', 'pl.po' + files defined in 'LINGUAS':
+  env.POUpdate(['en', 'pl' ], LINGUAS_FILE = 1) 
+.EE
+.IP
+.I "Example 7."
+Use \fB$POAUTOINIT\fP to automatically initialize \fBPO\fP file
+if it doesn't exist:
+.ES
+  # ...
+  env.POUpdate(LINGUAS_FILE = 1, POAUTOINIT = 1)
+.EE
+.IP
+.I "Example 8."
+Update \fBPO\fP files for languages defined in
+\fBLINGUAS\fP file. The files are updated from
+\fBfoo.pot\fP template. All necessary settings are
+pre-configured via environment.
+.ES
+  # ...
+  env['POAUTOINIT'] = 1
+  env['LINGUAS_FILE'] = 1
+  env['POTDOMAIN'] = 'foo'
+  env.POUpdate()
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Program()
+.IP env.Program()
+Builds an executable given one or more object files
+or C, C++, D, or Fortran source files.
+If any C, C++, D or Fortran source files are specified,
+then they will be automatically
+compiled to object files using the
+.BR Object ()
+builder method;
+see that builder method's description for
+a list of legal source file suffixes
+and how they are interpreted.
+The target executable file prefix
+(specified by the \fB$PROGPREFIX\fP construction variable; nothing by default)
+and suffix
+(specified by the \fB$PROGSUFFIX\fP construction variable;
+by default, \fB.exe\fP on Windows systems,
+nothing on POSIX systems)
+are automatically added to the target if not already present.
+Example:
+
+.ES
+env.Program(target = 'foo', source = ['foo.o', 'bar.c', 'baz.f'])
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP RES()
+.IP env.RES()
+Builds a Microsoft Visual C++ resource file.
+This builder method is only provided
+when Microsoft Visual C++ or MinGW is being used as the compiler. The
+.B .res
+(or
+.B .o
+for MinGW) suffix is added to the target name if no other suffix is given.
+The source
+file is scanned for implicit dependencies as though it were a C file.
+Example:
+
+.ES
+env.RES('resource.rc')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP RMIC()
+.IP env.RMIC()
+Builds stub and skeleton class files
+for remote objects
+from Java \fB.class\fP files.
+The target is a directory
+relative to which the stub
+and skeleton class files will be written.
+The source can be the names of \fB.class\fP files,
+or the objects return from the
+.BR Java ()
+builder method.
+
+If the construction variable
+.B $JAVACLASSDIR
+is set, either in the environment
+or in the call to the
+.BR RMIC ()
+builder method itself,
+then the value of the variable
+will be stripped from the
+beginning of any \fB.class \fP
+file names.
+
+.ES
+classes = env.Java(target = 'classdir', source = 'src')
+env.RMIC(target = 'outdir1', source = classes)
+
+env.RMIC(target = 'outdir2',
+         source = ['package/foo.class', 'package/bar.class'])
+
+env.RMIC(target = 'outdir3',
+         source = ['classes/foo.class', 'classes/bar.class'],
+         JAVACLASSDIR = 'classes')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP RPCGenClient()
+.IP env.RPCGenClient()
+Generates an RPC client stub (\fB_clnt.c\fP) file
+from a specified RPC (\fB.x\fP) source file.
+Because rpcgen only builds output files
+in the local directory,
+the command will be executed
+in the source file's directory by default.
+
+.ES
+# Builds src/rpcif_clnt.c
+env.RPCGenClient('src/rpcif.x')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP RPCGenHeader()
+.IP env.RPCGenHeader()
+Generates an RPC header (\fB.h\fP) file
+from a specified RPC (\fB.x\fP) source file.
+Because rpcgen only builds output files
+in the local directory,
+the command will be executed
+in the source file's directory by default.
+
+.ES
+# Builds src/rpcif.h
+env.RPCGenHeader('src/rpcif.x')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP RPCGenService()
+.IP env.RPCGenService()
+Generates an RPC server-skeleton (\fB_svc.c\fP) file
+from a specified RPC (\fB.x\fP) source file.
+Because rpcgen only builds output files
+in the local directory,
+the command will be executed
+in the source file's directory by default.
+
+.ES
+# Builds src/rpcif_svc.c
+env.RPCGenClient('src/rpcif.x')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP RPCGenXDR()
+.IP env.RPCGenXDR()
+Generates an RPC XDR routine (\fB_xdr.c\fP) file
+from a specified RPC (\fB.x\fP) source file.
+Because rpcgen only builds output files
+in the local directory,
+the command will be executed
+in the source file's directory by default.
+
+.ES
+# Builds src/rpcif_xdr.c
+env.RPCGenClient('src/rpcif.x')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP SharedLibrary()
+.IP env.SharedLibrary()
+Builds a shared library
+(\fB.so\fP on a POSIX system,
+\fB.dll\fP on Windows)
+given one or more object files
+or C, C++, D or Fortran source files.
+If any source files are given,
+then they will be automatically
+compiled to object files.
+The static library prefix and suffix (if any)
+are automatically added to the target.
+The target library file prefix
+(specified by the \fB$SHLIBPREFIX\fP construction variable;
+by default, \fBlib\fP on POSIX systems,
+nothing on Windows systems)
+and suffix
+(specified by the \fB$SHLIBSUFFIX\fP construction variable;
+by default, \fB.dll\fP on Windows systems,
+\fB.so\fP on POSIX systems)
+are automatically added to the target if not already present.
+Example:
+
+.ES
+env.SharedLibrary(target = 'bar', source = ['bar.c', 'foo.o'])
+.EE
+.IP
+On Windows systems, the
+.BR SharedLibrary ()
+builder method will always build an import
+(\fB.lib\fP) library
+in addition to the shared (\fB.dll\fP) library,
+adding a \fB.lib\fP library with the same basename
+if there is not already a \fB.lib\fP file explicitly
+listed in the targets.
+
+Any object files listed in the
+.B source
+must have been built for a shared library
+(that is, using the
+.BR SharedObject ()
+builder method).
+.B scons
+will raise an error if there is any mismatch.
+
+On some platforms, there is a distinction between a shared library
+(loaded automatically by the system to resolve external references)
+and a loadable module (explicitly loaded by user action).
+For maximum portability, use the \fBLoadableModule\fP() builder for the latter.
+
+When the \fB$SHLIBVERSION\fP construction variable is defined a versioned
+shared library is created. This modifies the \fB$SHLINKFLAGS\fP as required,
+adds the version number to the library name, and creates the symlinks that
+are needed. \fB$SHLIBVERSION\fP needs to be of the form X.Y.Z, where X
+and Y are numbers, and Z is a number but can also contain letters to designate
+alpha, beta, or release candidate patch levels.
+
+This builder may create multiple links to the library. On a POSIX system,
+for the shared library libbar.so.2.3.1, the links created would be
+libbar.so, libbar.so.2, and libbar.so.2.3; on a Darwin (OSX) system
+the library would be libbar.2.3.1.dylib and the link would be
+libbar.dylib.
+
+On Windows systems, specifying
+.B register=1
+will cause the \fB.dll\fP to be
+registered after it is built using REGSVR32.
+The command that is run
+("regsvr32" by default) is determined by \fB$REGSVR\fP construction
+variable, and the flags passed are determined by \fB$REGSVRFLAGS\fP.  By
+default, \fB$REGSVRFLAGS\fP includes the \fB/s\fP option,
+to prevent dialogs from popping
+up and requiring user attention when it is run.  If you change
+\fB$REGSVRFLAGS\fP, be sure to include the \fB/s\fP option.
+For example,
+
+.ES
+env.SharedLibrary(target = 'bar',
+                  source = ['bar.cxx', 'foo.obj'],
+                  register=1)
+.EE
+.IP
+will register \fBbar.dll\fP as a COM object
+when it is done linking it.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP SharedObject()
+.IP env.SharedObject()
+Builds an object file for
+inclusion in a shared library.
+Source files must have one of the same set of extensions
+specified above for the
+.BR StaticObject ()
+builder method.
+On some platforms building a shared object requires additional
+compiler option
+(e.g. \fB\-fPIC\fP for gcc)
+in addition to those needed to build a
+normal (static) object, but on some platforms there is no difference between a
+shared object and a normal (static) one. When there is a difference, SCons
+will only allow shared objects to be linked into a shared library, and will
+use a different suffix for shared objects. On platforms where there is no
+difference, SCons will allow both normal (static)
+and shared objects to be linked into a
+shared library, and will use the same suffix for shared and normal
+(static) objects.
+The target object file prefix
+(specified by the \fB$SHOBJPREFIX\fP construction variable;
+by default, the same as \fB$OBJPREFIX\fP)
+and suffix
+(specified by the \fB$SHOBJSUFFIX\fP construction variable)
+are automatically added to the target if not already present.
+Examples:
+
+.ES
+env.SharedObject(target = 'ddd', source = 'ddd.c')
+env.SharedObject(target = 'eee.o', source = 'eee.cpp')
+env.SharedObject(target = 'fff.obj', source = 'fff.for')
+.EE
+.IP
+Note that the source files will be scanned
+according to the suffix mappings in the
+.B SourceFileScanner
+object.
+See the section "Scanner Objects,"
+below, for more information.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP StaticLibrary()
+.IP env.StaticLibrary()
+Builds a static library given one or more object files
+or C, C++, D or Fortran source files.
+If any source files are given,
+then they will be automatically
+compiled to object files.
+The static library prefix and suffix (if any)
+are automatically added to the target.
+The target library file prefix
+(specified by the \fB$LIBPREFIX\fP construction variable;
+by default, \fBlib\fP on POSIX systems,
+nothing on Windows systems)
+and suffix
+(specified by the \fB$LIBSUFFIX\fP construction variable;
+by default, \fB.lib\fP on Windows systems,
+\fB.a\fP on POSIX systems)
+are automatically added to the target if not already present.
+Example:
+
+.ES
+env.StaticLibrary(target = 'bar', source = ['bar.c', 'foo.o'])
+.EE
+.IP
+Any object files listed in the
+.B source
+must have been built for a static library
+(that is, using the
+.BR StaticObject ()
+builder method).
+.B scons
+will raise an error if there is any mismatch.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP StaticObject()
+.IP env.StaticObject()
+Builds a static object file
+from one or more C, C++, D, or Fortran source files.
+Source files must have one of the following extensions:
+
+.ES
+  .asm    assembly language file
+  .ASM    assembly language file
+  .c      C file
+  .C      Windows:  C file
+          POSIX:  C++ file
+  .cc     C++ file
+  .cpp    C++ file
+  .cxx    C++ file
+  .cxx    C++ file
+  .c++    C++ file
+  .C++    C++ file
+  .d      D file
+  .f      Fortran file
+  .F      Windows:  Fortran file
+          POSIX:  Fortran file + C pre-processor
+  .for    Fortran file
+  .FOR    Fortran file
+  .fpp    Fortran file + C pre-processor
+  .FPP    Fortran file + C pre-processor
+  .m      Object C file
+  .mm     Object C++ file
+  .s      assembly language file
+  .S      Windows:  assembly language file
+          ARM: CodeSourcery Sourcery Lite
+  .sx     assembly language file + C pre-processor
+          POSIX:  assembly language file + C pre-processor
+  .spp    assembly language file + C pre-processor
+  .SPP    assembly language file + C pre-processor
+.EE
+.IP
+The target object file prefix
+(specified by the \fB$OBJPREFIX\fP construction variable; nothing by default)
+and suffix
+(specified by the \fB$OBJSUFFIX\fP construction variable;
+\fB.obj\fP on Windows systems,
+\fB.o\fP on POSIX systems)
+are automatically added to the target if not already present.
+Examples:
+
+.ES
+env.StaticObject(target = 'aaa', source = 'aaa.c')
+env.StaticObject(target = 'bbb.o', source = 'bbb.c++')
+env.StaticObject(target = 'ccc.obj', source = 'ccc.f')
+.EE
+.IP
+Note that the source files will be scanned
+according to the suffix mappings in
+.B SourceFileScanner
+object.
+See the section "Scanner Objects,"
+below, for more information.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Substfile()
+.IP env.Substfile()
+The \fBSubstfile\fP() builder generates a single text file
+by concatenating the source files.
+Nested lists of sources are flattened. 
+\fB$LINESEPARATOR\fP is used to separate the source files;
+see the description of \fBTextfile\fP() for details.
+
+If a single source file is present with an \fB.in\fP suffix,
+the suffix is stripped and the remainder is used as the default target name.
+
+The prefix and suffix specified by the \fB$SUBSTFILEPREFIX\fP
+and \fB$SUBSTFILESUFFIX\fP construction variables
+(the null string by default in both cases)
+are automatically added to the target if they are not already present.
+
+If a construction variable named \fB$SUBST_DICT\fP is present,
+it may be either a Python dictionary or a sequence of (key,value) tuples.
+If the former,
+the dictionary is converted into a list of tuples in an arbitrary order,
+so if one key is a prefix of another key
+or if one substitution could be further expanded by another subsitition,
+it is unpredictible whether the expansion will occur.
+
+Any occurences in the source of a key
+are replaced by the corresponding value,
+which may be a Python callable function or a string.
+If a value is a function,
+it is first called (with no arguments) to produce a string.
+The string is \fIsubst\fP-expanded
+and the result replaces the key.
+
+.ES
+env = Environment(tools = ['default', 'textfile'])
+
+env['prefix'] = '/usr/bin'
+script_dict = {'@prefix@': '/bin', @exec_prefix@: '$prefix'}
+env.Substfile('script.in', SUBST_DICT = script_dict)
+
+conf_dict = {'%VERSION%': '1.2.3', '%BASE%': 'MyProg'}
+env.Substfile('config.h.in', conf_dict, SUBST_DICT = conf_dict)
+
+# UNPREDICTABLE - one key is a prefix of another
+bad_foo = {'$foo': '$foo', '$foobar': '$foobar'}
+env.Substfile('foo.in', SUBST_DICT = bad_foo)
+
+# PREDICTABLE - keys are applied longest first
+good_foo = [('$foobar', '$foobar'), ('$foo', '$foo')]
+env.Substfile('foo.in', SUBST_DICT = good_foo)
+
+# UNPREDICTABLE - one substitution could be futher expanded
+bad_bar = {'@bar@': '@soap@', '@soap@': 'lye'}
+env.Substfile('bar.in', SUBST_DICT = bad_bar)
+
+# PREDICTABLE - substitutions are expanded in order
+good_bar = (('@bar@', '@soap@'), ('@soap@', 'lye'))
+env.Substfile('bar.in', SUBST_DICT = good_bar)
+
+# the SUBST_DICT may be in common (and not an override)
+substutions = {}
+subst = Environment(tools = ['textfile'], SUBST_DICT = substitutions)
+substitutions['@foo@'] = 'foo'
+subst['SUBST_DICT']['@bar@'] = 'bar'
+subst.Substfile('pgm1.c', [Value('#include "@foo@.h"'),
+                           Value('#include "@bar@.h"'),
+                           "common.in",
+                           "pgm1.in"
+                          ])
+subst.Substfile('pgm2.c', [Value('#include "@foo@.h"'),
+                           Value('#include "@bar@.h"'),
+                           "common.in",
+                           "pgm2.in"
+                          ])
+
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Tar()
+.IP env.Tar()
+Builds a tar archive of the specified files
+and/or directories.
+Unlike most builder methods,
+the
+.BR Tar ()
+builder method may be called multiple times
+for a given target;
+each additional call
+adds to the list of entries
+that will be built into the archive.
+Any source directories will
+be scanned for changes to
+any on-disk files,
+regardless of whether or not
+.B scons
+knows about them from other Builder or function calls.
+
+.ES
+env.Tar('src.tar', 'src')
+
+# Create the stuff.tar file.
+env.Tar('stuff', ['subdir1', 'subdir2'])
+# Also add "another" to the stuff.tar file.
+env.Tar('stuff', 'another')
+
+# Set TARFLAGS to create a gzip-filtered archive.
+env = Environment(TARFLAGS = '-c -z')
+env.Tar('foo.tar.gz', 'foo')
+
+# Also set the suffix to .tgz.
+env = Environment(TARFLAGS = '-c -z',
+                  TARSUFFIX = '.tgz')
+env.Tar('foo')
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Textfile()
+.IP env.Textfile()
+The \fBTextfile\fP() builder generates a single text file.
+The source strings constitute the lines;
+nested lists of sources are flattened. 
+\fB$LINESEPARATOR\fP is used to separate the strings.
+
+If present, the \fB$SUBST_DICT\fP construction variable
+is used to modify the strings before they are written;
+see the \fBSubstfile\fP() description for details.
+
+The prefix and suffix specified by the \fB$TEXTFILEPREFIX\fP
+and \fB$TEXTFILESUFFIX\fP construction variables
+(the null string and \fB.txt\fP by default, respectively)
+are automatically added to the target if they are not already present.
+Examples:
+
+.ES
+# builds/writes foo.txt
+env.Textfile(target = 'foo.txt', source = ['Goethe', 42, 'Schiller'])
+
+# builds/writes bar.txt
+env.Textfile(target = 'bar',
+             source = ['lalala', 'tanteratei'],
+             LINESEPARATOR='|*')
+
+# nested lists are flattened automatically
+env.Textfile(target = 'blob', 
+             source = ['lalala', ['Goethe', 42 'Schiller'], 'tanteratei'])
+
+# files may be used as input by wraping them in File()
+env.Textfile(target = 'concat',  # concatenate files with a marker between
+             source = [File('concat1'), File('concat2')],
+             LINESEPARATOR = '====================\\n')
+
+Results are:
+foo.txt
+  ....8<----
+  Goethe
+  42
+  Schiller
+  ....8<---- (no linefeed at the end)
+
+bar.txt:
+  ....8<----
+  lalala|*tanteratei
+  ....8<---- (no linefeed at the end)
+
+blob.txt
+  ....8<----
+  lalala
+  Goethe
+  42
+  Schiller
+  tanteratei
+  ....8<---- (no linefeed at the end)
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Translate()
+.IP env.Translate()
+This pseudo-builder belongs to &t-link-gettext; toolset. The builder extracts
+internationalized messages from source files, updates \fBPOT\fP
+template (if necessary) and then updates \fBPO\fP translations (if
+necessary). If \fB$POAUTOINIT\fP is set, missing \fBPO\fP files
+will be automatically created (i.e. without translator person intervention).
+The variables \fB$LINGUAS_FILE\fP and \fB$POTDOMAIN\fP are taken into
+acount too. All other construction variables used by \fBPOTUpdate\fP(), and
+\fBPOUpdate\fP() work here too.
+
+.IR Example 1 .
+The simplest way is to specify input files and output languages inline in
+a SCons script when invoking \fBTranslate\fP()
+.ES
+# SConscript in 'po/' directory
+env = Environment( tools = ["default", "gettext"] )
+env['POAUTOINIT'] = 1
+env.Translate(['en','pl'], ['../a.cpp','../b.cpp']) 
+.EE
+.IP
+.IR Example 2 .
+If you wish, you may also stick to conventional style known from
+<productname>autotools</productname>, i.e. using
+\fBPOTFILES.in\fP and \fBLINGUAS\fP files
+.ES
+# LINGUAS
+en pl 
+#end
+.EE
+
+.ES
+# POTFILES.in
+a.cpp
+b.cpp
+# end
+.EE
+
+.ES
+# SConscript
+env = Environment( tools = ["default", "gettext"] )
+env['POAUTOINIT'] = 1
+env['XGETTEXTPATH'] = ['../']
+env.Translate(LINGUAS_FILE = 1, XGETTEXTFROM = 'POTFILES.in') 
+.EE
+.IP
+The last approach is perhaps the recommended one. It allows easily split
+internationalization/localization onto separate SCons scripts, where a script
+in source tree is responsible for translations (from sources to
+\fBPO\fP files) and script(s) under variant directories are
+responsible for compilation of \fBPO\fP to \fBMO\fP
+files to and for installation of \fBMO\fP files. The "gluing
+factor" synchronizing these two scripts is then the content of
+\fBLINGUAS\fP file.  Note, that the updated
+\fBPOT\fP and \fBPO\fP files are usually going to be
+committed back to the repository, so they must be updated within the source
+directory (and not in variant directories). Additionaly, the file listing of
+\fBpo/\fP directory contains \fBLINGUAS\fP file,
+so the source tree looks familiar to translators, and they may work with the
+project in their usual way.
+
+.IR Example 3 .
+Let's prepare a development tree as below
+.ES
+ project/
+  + SConstruct
+  + build/        
+  + src/
+      + po/
+          + SConscript
+          + SConscript.i18n
+          + POTFILES.in
+          + LINGUAS
+.EE
+with \fBbuild\fP being variant directory. Write the top-level
+\fBSConstruct\fP script as follows
+.ES
+  # SConstruct
+  env = Environment( tools = ["default", "gettext"] )
+  VariantDir('build', 'src', duplicate = 0)
+  env['POAUTOINIT'] = 1
+  SConscript('src/po/SConscript.i18n', exports = 'env')
+  SConscript('build/po/SConscript', exports = 'env')
+.EE
+the \fBsrc/po/SConscript.i18n\fP as
+.ES
+  # src/po/SConscript.i18n
+  Import('env')
+  env.Translate(LINGUAS_FILE=1, XGETTEXTFROM='POTFILES.in', XGETTEXTPATH=['../'])
+.EE
+and the \fBsrc/po/SConscript\fP
+.ES
+  # src/po/SConscript
+  Import('env')
+  env.MOFiles(LINGUAS_FILE = 1)
+.EE
+Such setup produces \fBPOT\fP and \fBPO\fP files
+under source tree in \fBsrc/po/\fP and binary
+\fBMO\fP files under variant tree in
+\fBbuild/po/\fP. This way the \fBPOT\fP and
+\fBPO\fP files are separated from other output files, which must
+not be committed back to source repositories (e.g. \fBMO\fP
+files).
+
+<note>
+In above example, the \fBPO\fP files are not updated,
+nor created automatically when you issue \fBscons '.'\fP command.
+The files must be updated (created) by hand via \fBscons
+po-update\fP and then \fBMO\fP files can be compiled by
+running \fBscons '.'\fP.</para></note>
+
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP TypeLibrary()
+.IP env.TypeLibrary()
+Builds a Windows type library (\fB.tlb\fP)
+file from an input IDL file (\fB.idl\fP).
+In addition, it will build the associated inteface stub and
+proxy source files,
+naming them according to the base name of the \fB.idl\fP file.
+For example,
+
+.ES
+env.TypeLibrary(source="foo.idl")
+.EE
+.IP
+Will create \fBfoo.tlb\fP,
+.BR foo.h ,
+.BR foo_i.c ,
+.B foo_p.c
+and
+.B foo_data.c
+files.
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Uic()
+.IP env.Uic()
+Builds a header file, an implementation file and a moc file from an ui file.
+and returns the corresponding nodes in the above order.
+This builder is only available after using the tool 'qt'. Note: you can
+specify \fB.ui\fP files directly as source
+files to the \fBProgram\fP(),
+\fBLibrary\fP() and \fBSharedLibrary\fP() builders
+without using this builder. Using this builder lets you override the standard
+naming conventions (be careful: prefixes are always prepended to names of
+built files; if you don't want prefixes, you may set them to ``).
+See the \fB$QTDIR\fP variable for more information.
+Example:
+
+.ES
+env.Uic('foo.ui') # -> ['foo.h', 'uic_foo.cc', 'moc_foo.cc']
+env.Uic(target = Split('include/foo.h gen/uicfoo.cc gen/mocfoo.cc'),
+        source = 'foo.ui') # -> ['include/foo.h', 'gen/uicfoo.cc', 'gen/mocfoo.cc']
+.EE
+
+'\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.IP Zip()
+.IP env.Zip()
+Builds a zip archive of the specified files
+and/or directories.
+Unlike most builder methods,
+the
+.BR Zip ()
+builder method may be called multiple times
+for a given target;
+each additional call
+adds to the list of entries
+that will be built into the archive.
+Any source directories will
+be scanned for changes to
+any on-disk files,
+regardless of whether or not
+.B scons
+knows about them from other Builder or function calls.
+
+.ES
+env.Zip('src.zip', 'src')
+
+# Create the stuff.zip file.
+env.Zip('stuff', ['subdir1', 'subdir2'])
+# Also add "another" to the stuff.tar file.
+env.Zip('stuff', 'another')
+.EE

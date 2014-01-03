@@ -1,0 +1,4034 @@
+
+.IP AR
+The static library archiver.
+
+.IP ARCHITECTURE
+Specifies the system architecture for which
+the package is being built.
+The default is the system architecture
+of the machine on which SCons is running.
+This is used to fill in the
+.B Architecture:
+field in an Ipkg
+\fBcontrol\fP file,
+and as part of the name of a generated RPM file.
+
+.IP ARCOM
+The command line used to generate a static library from object files.
+
+.IP ARCOMSTR
+The string displayed when an object file
+is generated from an assembly-language source file.
+If this is not set, then \fB$ARCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(ARCOMSTR = "Archiving $TARGET")
+.EE
+
+.IP ARFLAGS
+General options passed to the static library archiver.
+
+.IP AS
+The assembler.
+
+.IP ASCOM
+The command line used to generate an object file
+from an assembly-language source file.
+
+.IP ASCOMSTR
+The string displayed when an object file
+is generated from an assembly-language source file.
+If this is not set, then \fB$ASCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(ASCOMSTR = "Assembling $TARGET")
+.EE
+
+.IP ASFLAGS
+General options passed to the assembler.
+
+.IP ASPPCOM
+The command line used to assemble an assembly-language
+source file into an object file
+after first running the file through the C preprocessor.
+Any options specified
+in the \fB$ASFLAGS\fP and \fB$CPPFLAGS\fP construction variables
+are included on this command line.
+
+.IP ASPPCOMSTR
+The string displayed when an object file
+is generated from an assembly-language source file
+after first running the file through the C preprocessor.
+If this is not set, then \fB$ASPPCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(ASPPCOMSTR = "Assembling $TARGET")
+.EE
+
+.IP ASPPFLAGS
+General options when an assembling an assembly-language
+source file into an object file
+after first running the file through the C preprocessor.
+The default is to use the value of \fB$ASFLAGS\fP.
+
+.IP BIBTEX
+The bibliography generator for the TeX formatter and typesetter and the
+LaTeX structured formatter and typesetter.
+
+.IP BIBTEXCOM
+The command line used to call the bibliography generator for the
+TeX formatter and typesetter and the LaTeX structured formatter and
+typesetter.
+
+.IP BIBTEXCOMSTR
+The string displayed when generating a bibliography
+for TeX or LaTeX.
+If this is not set, then \fB$BIBTEXCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(BIBTEXCOMSTR = "Generating bibliography $TARGET")
+.EE
+
+.IP BIBTEXFLAGS
+General options passed to the bibliography generator for the TeX formatter
+and typesetter and the LaTeX structured formatter and typesetter.
+
+.IP BITKEEPER
+The BitKeeper executable.
+
+.IP BITKEEPERCOM
+The command line for
+fetching source files using BitKeeper.
+
+.IP BITKEEPERCOMSTR
+The string displayed when fetching
+a source file using BitKeeper.
+If this is not set, then \fB$BITKEEPERCOM\fP
+(the command line) is displayed.
+
+.IP BITKEEPERGET
+The command (\fB$BITKEEPER\fP) and subcommand
+for fetching source files using BitKeeper.
+
+.IP BITKEEPERGETFLAGS
+Options that are passed to the BitKeeper
+.B get
+subcommand.
+
+.IP BUILDERS
+A dictionary mapping the names of the builders
+available through this environment
+to underlying Builder objects.
+Builders named
+Alias, CFile, CXXFile, DVI, Library, Object, PDF, PostScript, and Program
+are available by default.
+If you initialize this variable when an
+Environment is created:
+
+.ES
+env = Environment(BUILDERS = {'NewBuilder' : foo})
+.EE
+.IP
+the default Builders will no longer be available.
+To use a new Builder object in addition to the default Builders,
+add your new Builder object like this:
+
+.ES
+env = Environment()
+env.Append(BUILDERS = {'NewBuilder' : foo})
+.EE
+.IP
+or this:
+
+.ES
+env = Environment()
+env['BUILDERS]['NewBuilder'] = foo
+.EE
+
+.IP CC
+The C compiler.
+
+.IP CCCOM
+The command line used to compile a C source file to a (static) object
+file.  Any options specified in the \fB$CFLAGS\fP, \fB$CCFLAGS\fP and
+\fB$CPPFLAGS\fP construction variables are included on this command
+line.
+
+.IP CCCOMSTR
+The string displayed when a C source file
+is compiled to a (static) object file.
+If this is not set, then \fB$CCCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(CCCOMSTR = "Compiling static object $TARGET")
+.EE
+
+.IP CCFLAGS
+General options that are passed to the C and C++ compilers.
+
+.IP CCPCHFLAGS
+Options added to the compiler command line
+to support building with precompiled headers.
+The default value expands expands to the appropriate
+Microsoft Visual C++ command-line options
+when the \fB$PCH\fP construction variable is set.
+
+.IP CCPDBFLAGS
+Options added to the compiler command line
+to support storing debugging information in a
+Microsoft Visual C++ PDB file.
+The default value expands expands to appropriate
+Microsoft Visual C++ command-line options
+when the \fB$PDB\fP construction variable is set.
+
+The Visual C++ compiler option that SCons uses by default
+to generate PDB information is \fB/Z7\fP.
+This works correctly with parallel (\fB\-j\fP) builds
+because it embeds the debug information in the intermediate object files,
+as opposed to sharing a single PDB file between multiple object files.
+This is also the only way to get debug information
+embedded into a static library.
+Using the \fB/Zi\fP instead may yield improved
+link-time performance,
+although parallel builds will no longer work.
+
+You can generate PDB files with the \fB/Zi\fP
+switch by overriding the default \fB$CCPDBFLAGS\fP variable as follows:
+
+.ES
+env['CCPDBFLAGS'] = ['${(PDB and "/Zi /Fd%s" % File(PDB)) or ""}']
+.EE
+.IP
+An alternative would be to use the \fB/Zi\fP
+to put the debugging information in a separate \fB.pdb\fP
+file for each object file by overriding
+the \fB$CCPDBFLAGS\fP variable as follows:
+
+.ES
+env['CCPDBFLAGS'] = '/Zi /Fd${TARGET}.pdb'
+.EE
+
+.IP CCVERSION
+The version number of the C compiler.
+This may or may not be set,
+depending on the specific C compiler being used.
+
+.IP CFILESUFFIX
+The suffix for C source files.
+This is used by the internal CFile builder
+when generating C files from Lex (.l) or YACC (.y) input files.
+The default suffix, of course, is
+.B .c
+(lower case).
+On case-insensitive systems (like Windows),
+SCons also treats
+.B .C
+(upper case) files
+as C files.
+
+.IP CFLAGS
+General options that are passed to the C compiler (C only; not C++).
+
+.IP CHANGE_SPECFILE
+A hook for modifying the file that controls the packaging build
+(the \fB.spec\fP for RPM,
+the \fBcontrol\fP for Ipkg,
+the \fB.wxs\fP for MSI).
+If set, the function will be called
+after the SCons template for the file has been written.
+XXX
+
+.IP CHANGED_SOURCES
+A reserved variable name
+that may not be set or used in a construction environment.
+(See "Variable Substitution," below.)
+
+.IP CHANGED_TARGETS
+A reserved variable name
+that may not be set or used in a construction environment.
+(See "Variable Substitution," below.)
+
+.IP CHANGELOG
+The name of a file containing the change log text
+to be included in the package.
+This is included as the
+.B %changelog
+section of the RPM
+\fB.spec\fP file.
+
+.IP _concat
+A function used to produce variables like \fB$_CPPINCFLAGS\fP. It takes
+four or five
+arguments: a prefix to concatenate onto each element, a list of
+elements, a suffix to concatenate onto each element, an environment
+for variable interpolation, and an optional function that will be
+called to transform the list before concatenation.
+
+.ES
+env['_CPPINCFLAGS'] = '$( ${_concat(INCPREFIX, CPPPATH, INCSUFFIX, __env__, RDirs)} $)',
+.EE
+
+.IP CONFIGUREDIR
+The name of the directory in which
+Configure context test files are written.
+The default is
+.B .sconf_temp
+in the top-level directory
+containing the
+.B SConstruct
+file.
+
+.IP CONFIGURELOG
+The name of the Configure context log file.
+The default is
+.B config.log
+in the top-level directory
+containing the
+.B SConstruct
+file.
+
+.IP _CPPDEFFLAGS
+An automatically-generated construction variable
+containing the C preprocessor command-line options
+to define values.
+The value of \fB$_CPPDEFFLAGS\fP is created
+by appending \fB$CPPDEFPREFIX\fP and \fB$CPPDEFSUFFIX\fP
+to the beginning and end
+of each definition in \fB$CPPDEFINES\fP.
+
+.IP CPPDEFINES
+A platform independent specification of C preprocessor definitions.
+The definitions will be added to command lines
+through the automatically-generated
+\fB$_CPPDEFFLAGS\fP construction variable (see above),
+which is constructed according to
+the type of value of \fB$CPPDEFINES\fP:
+
+If \fB$CPPDEFINES\fP is a string,
+the values of the
+.BR $CPPDEFPREFIX  and  $CPPDEFSUFFIX
+construction variables
+will be added to the beginning and end.
+
+.ES
+# Will add -Dxyz to POSIX compiler command lines,
+# and /Dxyz to Microsoft Visual C++ command lines.
+env = Environment(CPPDEFINES='xyz')
+.EE
+.IP
+If \fB$CPPDEFINES\fP is a list,
+the values of the
+.BR $CPPDEFPREFIX  and  $CPPDEFSUFFIX
+construction variables
+will be appended to the beginning and end
+of each element in the list.
+If any element is a list or tuple,
+then the first item is the name being
+defined and the second item is its value:
+
+.ES
+# Will add -DB=2 -DA to POSIX compiler command lines,
+# and /DB=2 /DA to Microsoft Visual C++ command lines.
+env = Environment(CPPDEFINES=[('B', 2), 'A'])
+.EE
+.IP
+If \fB$CPPDEFINES\fP is a dictionary,
+the values of the
+.BR $CPPDEFPREFIX  and  $CPPDEFSUFFIX
+construction variables
+will be appended to the beginning and end
+of each item from the dictionary.
+The key of each dictionary item
+is a name being defined
+to the dictionary item's corresponding value;
+if the value is
+.BR None ,
+then the name is defined without an explicit value.
+Note that the resulting flags are sorted by keyword
+to ensure that the order of the options on the
+command line is consistent each time
+.B scons
+is run.
+
+.ES
+# Will add -DA -DB=2 to POSIX compiler command lines,
+# and /DA /DB=2 to Microsoft Visual C++ command lines.
+env = Environment(CPPDEFINES={'B':2, 'A':None})
+.EE
+
+.IP CPPDEFPREFIX
+The prefix used to specify preprocessor definitions
+on the C compiler command line.
+This will be appended to the beginning of each definition
+in the \fB$CPPDEFINES\fP construction variable
+when the \fB$_CPPDEFFLAGS\fP variable is automatically generated.
+
+.IP CPPDEFSUFFIX
+The suffix used to specify preprocessor definitions
+on the C compiler command line.
+This will be appended to the end of each definition
+in the \fB$CPPDEFINES\fP construction variable
+when the \fB$_CPPDEFFLAGS\fP variable is automatically generated.
+
+.IP CPPFLAGS
+User-specified C preprocessor options.
+These will be included in any command that uses the C preprocessor,
+including not just compilation of C and C++ source files
+via the \fB$CCCOM\fP,
+.BR $SHCCCOM ,
+\fB$CXXCOM\fP and
+\fB$SHCXXCOM\fP command lines,
+but also the \fB$FORTRANPPCOM\fP,
+.BR $SHFORTRANPPCOM ,
+\fB$F77PPCOM\fP and
+\fB$SHF77PPCOM\fP command lines
+used to compile a Fortran source file,
+and the \fB$ASPPCOM\fP command line
+used to assemble an assembly language source file,
+after first running each file through the C preprocessor.
+Note that this variable does
+.I not
+contain
+.B \-I
+(or similar) include search path options
+that scons generates automatically from \fB$CPPPATH\fP.
+See \fB$_CPPINCFLAGS\fP, below,
+for the variable that expands to those options.
+
+.IP _CPPINCFLAGS
+An automatically-generated construction variable
+containing the C preprocessor command-line options
+for specifying directories to be searched for include files.
+The value of \fB$_CPPINCFLAGS\fP is created
+by appending \fB$INCPREFIX\fP and \fB$INCSUFFIX\fP
+to the beginning and end
+of each directory in \fB$CPPPATH\fP.
+
+.IP CPPPATH
+The list of directories that the C preprocessor will search for include
+directories. The C/C++ implicit dependency scanner will search these
+directories for include files. Don't explicitly put include directory
+arguments in CCFLAGS or CXXFLAGS because the result will be non-portable
+and the directories will not be searched by the dependency scanner. Note:
+directory names in CPPPATH will be looked-up relative to the SConscript
+directory when they are used in a command. To force
+.B scons
+to look-up a directory relative to the root of the source tree use #:
+
+.ES
+env = Environment(CPPPATH='#/include')
+.EE
+.IP
+The directory look-up can also be forced using the
+.BR Dir ()
+function:
+
+.ES
+include = Dir('include')
+env = Environment(CPPPATH=include)
+.EE
+.IP
+The directory list will be added to command lines
+through the automatically-generated
+.B $_CPPINCFLAGS
+construction variable,
+which is constructed by
+appending the values of the
+.BR $INCPREFIX  and  $INCSUFFIX
+construction variables
+to the beginning and end
+of each directory in \fB$CPPPATH\fP.
+Any command lines you define that need
+the CPPPATH directory list should
+include \fB$_CPPINCFLAGS\fP:
+
+.ES
+env = Environment(CCCOM="my_compiler $_CPPINCFLAGS -c -o $TARGET $SOURCE")
+.EE
+
+.IP CPPSUFFIXES
+The list of suffixes of files that will be scanned
+for C preprocessor implicit dependencies
+(#include lines).
+The default list is:
+
+.ES
+[".c", ".C", ".cxx", ".cpp", ".c++", ".cc",
+ ".h", ".H", ".hxx", ".hpp", ".hh",
+ ".F", ".fpp", ".FPP",
+ ".m", ".mm",
+ ".S", ".spp", ".SPP"]
+.EE
+
+.IP CVS
+The CVS executable.
+
+.IP CVSCOFLAGS
+Options that are passed to the CVS checkout subcommand.
+
+.IP CVSCOM
+The command line used to
+fetch source files from a CVS repository.
+
+.IP CVSCOMSTR
+The string displayed when fetching
+a source file from a CVS repository.
+If this is not set, then \fB$CVSCOM\fP
+(the command line) is displayed.
+
+.IP CVSFLAGS
+General options that are passed to CVS.
+By default, this is set to
+.B "-d $CVSREPOSITORY"
+to specify from where the files must be fetched.
+
+.IP CVSREPOSITORY
+The path to the CVS repository.
+This is referenced in the default
+\fB$CVSFLAGS\fP value.
+
+.IP CXX
+The C++ compiler.
+
+.IP CXXCOM
+The command line used to compile a C++ source file to an object file.
+Any options specified in the \fB$CXXFLAGS\fP and
+\fB$CPPFLAGS\fP construction variables
+are included on this command line.
+
+.IP CXXCOMSTR
+The string displayed when a C++ source file
+is compiled to a (static) object file.
+If this is not set, then \fB$CXXCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(CXXCOMSTR = "Compiling static object $TARGET")
+.EE
+
+.IP CXXFILESUFFIX
+The suffix for C++ source files.
+This is used by the internal CXXFile builder
+when generating C++ files from Lex (.ll) or YACC (.yy) input files.
+The default suffix is
+.BR .cc .
+SCons also treats files with the suffixes
+.BR .cpp ,
+.BR .cxx ,
+.BR .c++ ,
+and
+.B .C++
+as C++ files,
+and files with
+.B .mm
+suffixes as Objective C++ files.
+On case-sensitive systems (Linux, UNIX, and other POSIX-alikes),
+SCons also treats
+.B .C
+(upper case) files
+as C++ files.
+
+.IP CXXFLAGS
+General options that are passed to the C++ compiler.
+By default, this includes the value of \fB$CCFLAGS\fP,
+so that setting \fB$CCFLAGS\fP affects both C and C++ compilation.
+If you want to add C++-specific flags,
+you must set or override the value of \fB$CXXFLAGS\fP.
+
+.IP CXXVERSION
+The version number of the C++ compiler.
+This may or may not be set,
+depending on the specific C++ compiler being used.
+
+.IP DESCRIPTION
+A long description of the project being packaged.
+This is included in the relevant section
+of the file that controls the packaging build.
+
+.IP DESCRIPTION_lang
+A language-specific long description for
+the specified \fIlang\fP.
+This is used to populate a
+.B "%description -l"
+section of an RPM
+\fB.spec\fP file.
+
+.IP Dir
+A function that converts a string
+into a Dir instance relative to the target being built.
+
+.IP Dirs
+A function that converts a list of strings
+into a list of Dir instances relative to the target being built.
+
+.IP DSUFFIXES
+The list of suffixes of files that will be scanned
+for imported D package files.
+The default list is:
+
+.ES
+['.d']
+.EE
+
+.IP DVIPDF
+The TeX DVI file to PDF file converter.
+
+.IP DVIPDFCOM
+The command line used to convert TeX DVI files into a PDF file.
+
+.IP DVIPDFCOMSTR
+The string displayed when a TeX DVI file
+is converted into a PDF file.
+If this is not set, then \fB$DVIPDFCOM\fP (the command line) is displayed.
+
+.IP DVIPDFFLAGS
+General options passed to the TeX DVI file to PDF file converter.
+
+.IP DVIPS
+The TeX DVI file to PostScript converter.
+
+.IP DVIPSFLAGS
+General options passed to the TeX DVI file to PostScript converter.
+
+.IP ENV
+A dictionary of environment variables
+to use when invoking commands. When
+\fB$ENV\fP is used in a command all list
+values will be joined using the path separator and any other non-string
+values will simply be coerced to a string.
+Note that, by default,
+.B scons
+does
+.I not
+propagate the environment in force when you
+execute
+.B scons
+to the commands used to build target files.
+This is so that builds will be guaranteed
+repeatable regardless of the environment
+variables set at the time
+.B scons
+is invoked.
+
+If you want to propagate your
+environment variables
+to the commands executed
+to build target files,
+you must do so explicitly:
+
+.ES
+import os
+env = Environment(ENV = os.environ)
+.EE
+.IP
+Note that you can choose only to propagate
+certain environment variables.
+A common example is
+the system
+.B PATH
+environment variable,
+so that
+.B scons
+uses the same utilities
+as the invoking shell (or other process):
+
+.ES
+import os
+env = Environment(ENV = {'PATH' : os.environ['PATH']})
+.EE
+
+.IP ESCAPE
+A function that will be called to escape shell special characters in
+command lines. The function should take one argument: the command line
+string to escape; and should return the escaped command line.
+
+.IP F77
+The Fortran 77 compiler.
+You should normally set the \fB$FORTRAN\fP variable,
+which specifies the default Fortran compiler
+for all Fortran versions.
+You only need to set \fB$F77\fP if you need to use a specific compiler
+or compiler version for Fortran 77 files.
+
+.IP F77COM
+The command line used to compile a Fortran 77 source file to an object file.
+You only need to set \fB$F77COM\fP if you need to use a specific
+command line for Fortran 77 files.
+You should normally set the \fB$FORTRANCOM\fP variable,
+which specifies the default command line
+for all Fortran versions.
+
+.IP F77COMSTR
+The string displayed when a Fortran 77 source file
+is compiled to an object file.
+If this is not set, then \fB$F77COM\fP or \fB$FORTRANCOM\fP
+(the command line) is displayed.
+
+.IP F77FILESUFFIXES
+The list of file extensions for which the F77 dialect will be used. By
+default, this is ['.f77']
+
+.IP F77FLAGS
+General user-specified options that are passed to the Fortran 77 compiler.
+Note that this variable does
+.I not
+contain
+.B \-I
+(or similar) include search path options
+that scons generates automatically from \fB$F77PATH\fP.
+See
+.B $_F77INCFLAGS
+below,
+for the variable that expands to those options.
+You only need to set \fB$F77FLAGS\fP if you need to define specific
+user options for Fortran 77 files.
+You should normally set the \fB$FORTRANFLAGS\fP variable,
+which specifies the user-specified options
+passed to the default Fortran compiler
+for all Fortran versions.
+
+.IP _F77INCFLAGS
+An automatically-generated construction variable
+containing the Fortran 77 compiler command-line options
+for specifying directories to be searched for include files.
+The value of \fB$_F77INCFLAGS\fP is created
+by appending \fB$INCPREFIX\fP and \fB$INCSUFFIX\fP
+to the beginning and end
+of each directory in \fB$F77PATH\fP.
+
+.IP F77PATH
+The list of directories that the Fortran 77 compiler will search for include
+directories. The implicit dependency scanner will search these
+directories for include files. Don't explicitly put include directory
+arguments in \fB$F77FLAGS\fP because the result will be non-portable
+and the directories will not be searched by the dependency scanner. Note:
+directory names in \fB$F77PATH\fP will be looked-up relative to the SConscript
+directory when they are used in a command. To force
+.B scons
+to look-up a directory relative to the root of the source tree use #:
+You only need to set \fB$F77PATH\fP if you need to define a specific
+include path for Fortran 77 files.
+You should normally set the \fB$FORTRANPATH\fP variable,
+which specifies the include path
+for the default Fortran compiler
+for all Fortran versions.
+
+.ES
+env = Environment(F77PATH='#/include')
+.EE
+.IP
+The directory look-up can also be forced using the
+.BR Dir ()
+function:
+
+.ES
+include = Dir('include')
+env = Environment(F77PATH=include)
+.EE
+.IP
+The directory list will be added to command lines
+through the automatically-generated
+.B $_F77INCFLAGS
+construction variable,
+which is constructed by
+appending the values of the
+.BR $INCPREFIX  and  $INCSUFFIX
+construction variables
+to the beginning and end
+of each directory in \fB$F77PATH\fP.
+Any command lines you define that need
+the F77PATH directory list should
+include \fB$_F77INCFLAGS\fP:
+
+.ES
+env = Environment(F77COM="my_compiler $_F77INCFLAGS -c -o $TARGET $SOURCE")
+.EE
+
+.IP F77PPCOM
+The command line used to compile a Fortran 77 source file to an object file
+after first running the file through the C preprocessor.
+Any options specified in the \fB$F77FLAGS\fP and \fB$CPPFLAGS\fP construction variables
+are included on this command line.
+You only need to set \fB$F77PPCOM\fP if you need to use a specific
+C-preprocessor command line for Fortran 77 files.
+You should normally set the \fB$FORTRANPPCOM\fP variable,
+which specifies the default C-preprocessor command line
+for all Fortran versions.
+
+.IP F77PPCOMSTR
+The string displayed when a Fortran 77 source file
+is compiled to an object file
+after first running the file through the C preprocessor.
+If this is not set, then \fB$F77PPCOM\fP or \fB$FORTRANPPCOM\fP
+(the command line) is displayed.
+
+.IP F77PPFILESUFFIXES
+The list of file extensions for which the compilation + preprocessor pass for
+F77 dialect will be used. By default, this is empty
+
+.IP F90
+The Fortran 90 compiler.
+You should normally set the \fB$FORTRAN\fP variable,
+which specifies the default Fortran compiler
+for all Fortran versions.
+You only need to set \fB$F90\fP if you need to use a specific compiler
+or compiler version for Fortran 90 files.
+
+.IP F90COM
+The command line used to compile a Fortran 90 source file to an object file.
+You only need to set \fB$F90COM\fP if you need to use a specific
+command line for Fortran 90 files.
+You should normally set the \fB$FORTRANCOM\fP variable,
+which specifies the default command line
+for all Fortran versions.
+
+.IP F90COMSTR
+The string displayed when a Fortran 90 source file
+is compiled to an object file.
+If this is not set, then \fB$F90COM\fP or \fB$FORTRANCOM\fP
+(the command line) is displayed.
+
+.IP F90FILESUFFIXES
+The list of file extensions for which the F90 dialect will be used. By
+default, this is ['.f90']
+
+.IP F90FLAGS
+General user-specified options that are passed to the Fortran 90 compiler.
+Note that this variable does
+.I not
+contain
+.B \-I
+(or similar) include search path options
+that scons generates automatically from \fB$F90PATH\fP.
+See
+.B $_F90INCFLAGS
+below,
+for the variable that expands to those options.
+You only need to set \fB$F90FLAGS\fP if you need to define specific
+user options for Fortran 90 files.
+You should normally set the \fB$FORTRANFLAGS\fP variable,
+which specifies the user-specified options
+passed to the default Fortran compiler
+for all Fortran versions.
+
+.IP _F90INCFLAGS
+An automatically-generated construction variable
+containing the Fortran 90 compiler command-line options
+for specifying directories to be searched for include files.
+The value of \fB$_F90INCFLAGS\fP is created
+by appending \fB$INCPREFIX\fP and \fB$INCSUFFIX\fP
+to the beginning and end
+of each directory in \fB$F90PATH\fP.
+
+.IP F90PATH
+The list of directories that the Fortran 90 compiler will search for include
+directories. The implicit dependency scanner will search these
+directories for include files. Don't explicitly put include directory
+arguments in \fB$F90FLAGS\fP because the result will be non-portable
+and the directories will not be searched by the dependency scanner. Note:
+directory names in \fB$F90PATH\fP will be looked-up relative to the SConscript
+directory when they are used in a command. To force
+.B scons
+to look-up a directory relative to the root of the source tree use #:
+You only need to set \fB$F90PATH\fP if you need to define a specific
+include path for Fortran 90 files.
+You should normally set the \fB$FORTRANPATH\fP variable,
+which specifies the include path
+for the default Fortran compiler
+for all Fortran versions.
+
+.ES
+env = Environment(F90PATH='#/include')
+.EE
+.IP
+The directory look-up can also be forced using the
+.BR Dir ()
+function:
+
+.ES
+include = Dir('include')
+env = Environment(F90PATH=include)
+.EE
+.IP
+The directory list will be added to command lines
+through the automatically-generated
+.B $_F90INCFLAGS
+construction variable,
+which is constructed by
+appending the values of the
+.BR $INCPREFIX  and  $INCSUFFIX
+construction variables
+to the beginning and end
+of each directory in \fB$F90PATH\fP.
+Any command lines you define that need
+the F90PATH directory list should
+include \fB$_F90INCFLAGS\fP:
+
+.ES
+env = Environment(F90COM="my_compiler $_F90INCFLAGS -c -o $TARGET $SOURCE")
+.EE
+
+.IP F90PPCOM
+The command line used to compile a Fortran 90 source file to an object file
+after first running the file through the C preprocessor.
+Any options specified in the \fB$F90FLAGS\fP and \fB$CPPFLAGS\fP construction variables
+are included on this command line.
+You only need to set \fB$F90PPCOM\fP if you need to use a specific
+C-preprocessor command line for Fortran 90 files.
+You should normally set the \fB$FORTRANPPCOM\fP variable,
+which specifies the default C-preprocessor command line
+for all Fortran versions.
+
+.IP F90PPCOMSTR
+The string displayed when a Fortran 90 source file
+is compiled after first running the file through the C preprocessor.
+If this is not set, then \fB$F90PPCOM\fP or \fB$FORTRANPPCOM\fP
+(the command line) is displayed.
+
+.IP F90PPFILESUFFIXES
+The list of file extensions for which the compilation + preprocessor pass for
+F90 dialect will be used. By default, this is empty
+
+.IP F95
+The Fortran 95 compiler.
+You should normally set the \fB$FORTRAN\fP variable,
+which specifies the default Fortran compiler
+for all Fortran versions.
+You only need to set \fB$F95\fP if you need to use a specific compiler
+or compiler version for Fortran 95 files.
+
+.IP F95COM
+The command line used to compile a Fortran 95 source file to an object file.
+You only need to set \fB$F95COM\fP if you need to use a specific
+command line for Fortran 95 files.
+You should normally set the \fB$FORTRANCOM\fP variable,
+which specifies the default command line
+for all Fortran versions.
+
+.IP F95COMSTR
+The string displayed when a Fortran 95 source file
+is compiled to an object file.
+If this is not set, then \fB$F95COM\fP or \fB$FORTRANCOM\fP
+(the command line) is displayed.
+
+.IP F95FILESUFFIXES
+The list of file extensions for which the F95 dialect will be used. By
+default, this is ['.f95']
+
+.IP F95FLAGS
+General user-specified options that are passed to the Fortran 95 compiler.
+Note that this variable does
+.I not
+contain
+.B \-I
+(or similar) include search path options
+that scons generates automatically from \fB$F95PATH\fP.
+See
+.B $_F95INCFLAGS
+below,
+for the variable that expands to those options.
+You only need to set \fB$F95FLAGS\fP if you need to define specific
+user options for Fortran 95 files.
+You should normally set the \fB$FORTRANFLAGS\fP variable,
+which specifies the user-specified options
+passed to the default Fortran compiler
+for all Fortran versions.
+
+.IP _F95INCFLAGS
+An automatically-generated construction variable
+containing the Fortran 95 compiler command-line options
+for specifying directories to be searched for include files.
+The value of \fB$_F95INCFLAGS\fP is created
+by appending \fB$INCPREFIX\fP and \fB$INCSUFFIX\fP
+to the beginning and end
+of each directory in \fB$F95PATH\fP.
+
+.IP F95PATH
+The list of directories that the Fortran 95 compiler will search for include
+directories. The implicit dependency scanner will search these
+directories for include files. Don't explicitly put include directory
+arguments in \fB$F95FLAGS\fP because the result will be non-portable
+and the directories will not be searched by the dependency scanner. Note:
+directory names in \fB$F95PATH\fP will be looked-up relative to the SConscript
+directory when they are used in a command. To force
+.B scons
+to look-up a directory relative to the root of the source tree use #:
+You only need to set \fB$F95PATH\fP if you need to define a specific
+include path for Fortran 95 files.
+You should normally set the \fB$FORTRANPATH\fP variable,
+which specifies the include path
+for the default Fortran compiler
+for all Fortran versions.
+
+.ES
+env = Environment(F95PATH='#/include')
+.EE
+.IP
+The directory look-up can also be forced using the
+.BR Dir ()
+function:
+
+.ES
+include = Dir('include')
+env = Environment(F95PATH=include)
+.EE
+.IP
+The directory list will be added to command lines
+through the automatically-generated
+.B $_F95INCFLAGS
+construction variable,
+which is constructed by
+appending the values of the
+.BR $INCPREFIX  and  $INCSUFFIX
+construction variables
+to the beginning and end
+of each directory in \fB$F95PATH\fP.
+Any command lines you define that need
+the F95PATH directory list should
+include \fB$_F95INCFLAGS\fP:
+
+.ES
+env = Environment(F95COM="my_compiler $_F95INCFLAGS -c -o $TARGET $SOURCE")
+.EE
+
+.IP F95PPCOM
+The command line used to compile a Fortran 95 source file to an object file
+after first running the file through the C preprocessor.
+Any options specified in the \fB$F95FLAGS\fP and \fB$CPPFLAGS\fP construction variables
+are included on this command line.
+You only need to set \fB$F95PPCOM\fP if you need to use a specific
+C-preprocessor command line for Fortran 95 files.
+You should normally set the \fB$FORTRANPPCOM\fP variable,
+which specifies the default C-preprocessor command line
+for all Fortran versions.
+
+.IP F95PPCOMSTR
+The string displayed when a Fortran 95 source file
+is compiled to an object file
+after first running the file through the C preprocessor.
+If this is not set, then \fB$F95PPCOM\fP or \fB$FORTRANPPCOM\fP
+(the command line) is displayed.
+
+.IP F95PPFILESUFFIXES
+The list of file extensions for which the compilation + preprocessor pass for
+F95 dialect will be used. By default, this is empty
+
+.IP File
+A function that converts a string into a File instance relative to the
+target being built.
+
+.IP FORTRAN
+The default Fortran compiler
+for all versions of Fortran.
+
+.IP FORTRANCOM
+The command line used to compile a Fortran source file to an object file.
+By default, any options specified
+in the \fB$FORTRANFLAGS\fP,
+.BR $CPPFLAGS ,
+.BR $_CPPDEFFLAGS ,
+\fB$_FORTRANMODFLAG\fP, and
+\fB$_FORTRANINCFLAGS\fP construction variables
+are included on this command line.
+
+.IP FORTRANCOMSTR
+The string displayed when a Fortran source file
+is compiled to an object file.
+If this is not set, then \fB$FORTRANCOM\fP
+(the command line) is displayed.
+
+.IP FORTRANFILESUFFIXES
+The list of file extensions for which the FORTRAN dialect will be used. By
+default, this is ['.f', '.for', '.ftn']
+
+.IP FORTRANFLAGS
+General user-specified options that are passed to the Fortran compiler.
+Note that this variable does
+.I not
+contain
+.B \-I
+(or similar) include or module search path options
+that scons generates automatically from \fB$FORTRANPATH\fP.
+See
+.BR $_FORTRANINCFLAGS\fP and \fB$_FORTRANMODFLAG ,
+below,
+for the variables that expand those options.
+
+.IP _FORTRANINCFLAGS
+An automatically-generated construction variable
+containing the Fortran compiler command-line options
+for specifying directories to be searched for include
+files and module files.
+The value of \fB$_FORTRANINCFLAGS\fP is created
+by prepending/appending \fB$INCPREFIX\fP and \fB$INCSUFFIX\fP
+to the beginning and end
+of each directory in \fB$FORTRANPATH\fP.
+
+.IP FORTRANMODDIR
+Directory location where the Fortran compiler should place
+any module files it generates.  This variable is empty, by default. Some
+Fortran compilers will internally append this directory in the search path
+for module files, as well.
+
+.IP FORTRANMODDIRPREFIX
+The prefix used to specify a module directory on the Fortran compiler command
+line.
+This will be appended to the beginning of the directory
+in the \fB$FORTRANMODDIR\fP construction variables
+when the \fB$_FORTRANMODFLAG\fP variables is automatically generated.
+
+.IP FORTRANMODDIRSUFFIX
+The suffix used to specify a module directory on the Fortran compiler command
+line.
+This will be appended to the beginning of the directory
+in the \fB$FORTRANMODDIR\fP construction variables
+when the \fB$_FORTRANMODFLAG\fP variables is automatically generated.
+
+.IP _FORTRANMODFLAG
+An automatically-generated construction variable
+containing the Fortran compiler command-line option
+for specifying the directory location where the Fortran
+compiler should place any module files that happen to get
+generated during compilation.
+The value of \fB$_FORTRANMODFLAG\fP is created
+by prepending/appending \fB$FORTRANMODDIRPREFIX\fP and
+.B $FORTRANMODDIRSUFFIX
+to the beginning and end of the directory in \fB$FORTRANMODDIR\fP.
+
+.IP FORTRANMODPREFIX
+The module file prefix used by the Fortran compiler.  SCons assumes that
+the Fortran compiler follows the quasi-standard naming convention for
+module files of
+.BR module_name.mod .
+As a result, this variable is left empty, by default.  For situations in
+which the compiler does not necessarily follow the normal convention,
+the user may use this variable.  Its value will be appended to every
+module file name as scons attempts to resolve dependencies.
+
+.IP FORTRANMODSUFFIX
+The module file suffix used by the Fortran compiler.  SCons assumes that
+the Fortran compiler follows the quasi-standard naming convention for
+module files of
+.BR module_name.mod .
+As a result, this variable is set to ".mod", by default.  For situations
+in which the compiler does not necessarily follow the normal convention,
+the user may use this variable.  Its value will be appended to every
+module file name as scons attempts to resolve dependencies.
+
+.IP FORTRANPATH
+The list of directories that the Fortran compiler will search for
+include files and (for some compilers) module files. The Fortran implicit
+dependency scanner will search these directories for include files (but
+not module files since they are autogenerated and, as such, may not
+actually exist at the time the scan takes place). Don't explicitly put
+include directory arguments in FORTRANFLAGS because the result will be
+non-portable and the directories will not be searched by the dependency
+scanner. Note: directory names in FORTRANPATH will be looked-up relative
+to the SConscript directory when they are used in a command. To force
+.B scons
+to look-up a directory relative to the root of the source tree use #:
+
+.ES
+env = Environment(FORTRANPATH='#/include')
+.EE
+.IP
+The directory look-up can also be forced using the
+.BR Dir ()
+function:
+
+.ES
+include = Dir('include')
+env = Environment(FORTRANPATH=include)
+.EE
+.IP
+The directory list will be added to command lines
+through the automatically-generated
+.B $_FORTRANINCFLAGS
+construction variable,
+which is constructed by
+appending the values of the
+.BR $INCPREFIX  and  $INCSUFFIX
+construction variables
+to the beginning and end
+of each directory in \fB$FORTRANPATH\fP.
+Any command lines you define that need
+the FORTRANPATH directory list should
+include \fB$_FORTRANINCFLAGS\fP:
+
+.ES
+env = Environment(FORTRANCOM="my_compiler $_FORTRANINCFLAGS -c -o $TARGET $SOURCE")
+.EE
+
+.IP FORTRANPPCOM
+The command line used to compile a Fortran source file to an object file
+after first running the file through the C preprocessor.
+By default, any options specified in the \fB$FORTRANFLAGS\fP,
+.BR $CPPFLAGS ,
+.BR $_CPPDEFFLAGS ,
+\fB$_FORTRANMODFLAG\fP, and
+.B $_FORTRANINCFLAGS
+construction variables are included on this command line.
+
+.IP FORTRANPPCOMSTR
+The string displayed when a Fortran source file
+is compiled to an object file
+after first running the file through the C preprocessor.
+If this is not set, then \fB$FORTRANPPCOM\fP
+(the command line) is displayed.
+
+.IP FORTRANPPFILESUFFIXES
+The list of file extensions for which the compilation + preprocessor pass for
+FORTRAN dialect will be used. By default, this is ['.fpp', '.FPP']
+
+.IP FORTRANSUFFIXES
+The list of suffixes of files that will be scanned
+for Fortran implicit dependencies
+(INCLUDE lines and USE statements).
+The default list is:
+
+.ES
+[".f", ".F", ".for", ".FOR", ".ftn", ".FTN", ".fpp", ".FPP",
+".f77", ".F77", ".f90", ".F90", ".f95", ".F95"]
+.EE
+
+.IP FRAMEWORKPATH
+On Mac OS X with gcc,
+a list containing the paths to search for frameworks.
+Used by the compiler to find framework-style includes like
+#include <Fmwk/Header.h>.
+Used by the linker to find user-specified frameworks when linking (see
+.BR $FRAMEWORKS ).
+For example:
+
+.ES
+ env.AppendUnique(FRAMEWORKPATH='#myframeworkdir')
+.EE
+.IP
+will add
+
+.ES
+  ... -Fmyframeworkdir
+.EE
+.IP
+to the compiler and linker command lines.
+
+.IP _FRAMEWORKPATH
+On Mac OS X with gcc, an automatically-generated construction variable
+containing the linker command-line options corresponding to
+.BR $FRAMEWORKPATH .
+
+.IP FRAMEWORKPATHPREFIX
+On Mac OS X with gcc, the prefix to be used for the FRAMEWORKPATH entries.
+(see \fB$FRAMEWORKPATH\fP).
+The default value is
+.BR \-F .
+
+.IP FRAMEWORKPREFIX
+On Mac OS X with gcc,
+the prefix to be used for linking in frameworks
+(see \fB$FRAMEWORKS\fP).
+The default value is
+.BR \-framework .
+
+.IP _FRAMEWORKS
+On Mac OS X with gcc,
+an automatically-generated construction variable
+containing the linker command-line options
+for linking with FRAMEWORKS.
+
+.IP FRAMEWORKS
+On Mac OS X with gcc, a list of the framework names to be linked into a
+program or shared library or bundle.
+The default value is the empty list.
+For example:
+
+.ES
+ env.AppendUnique(FRAMEWORKS=Split('System Cocoa SystemConfiguration'))
+.EE
+.IP
+
+.IP FRAMEWORKSFLAGS
+On Mac OS X with gcc,
+general user-supplied frameworks options to be added at
+the end of a command
+line building a loadable module.
+(This has been largely superseded by
+the \fB$FRAMEWORKPATH\fP, \fB$FRAMEWORKPATHPREFIX\fP,
+\fB$FRAMEWORKPREFIX\fP and \fB$FRAMEWORKS\fP variables
+described above.)
+
+.IP GS
+The Ghostscript program used to convert PostScript to PDF files.
+
+.IP GSCOM
+The Ghostscript command line used to convert PostScript to PDF files.
+
+.IP GSCOMSTR
+The string displayed when
+Ghostscript is used to convert
+a PostScript file to a PDF file.
+If this is not set, then \fB$GSCOM\fP (the command line) is displayed.
+
+.IP GSFLAGS
+General options passed to the Ghostscript program
+when converting PostScript to PDF files.
+
+.IP HOST_ARCH
+Sets the host architecture for Visual Studio compiler. If not set,
+default to the detected host architecture: note that this may depend
+on the python you are using.
+This variable must be passed as an argument to the Environment()
+constructor; setting it later has no effect. 
+
+Valid values are the same as for \fB$TARGET_ARCH\fP.
+
+This is currently only used on Windows, but in the future it will be
+used on other OSes as well.
+
+.IP HOST_OS
+        The name of the host operating system used to create the Environment.
+        If a platform is specified when creating the Environment, then
+        that Platform's logic will handle setting this value.
+        This value is immutable, and should not be changed by the user after
+        the Environment is initialized.
+        Currently only set for Win32.
+    
+.IP IDLSUFFIXES
+The list of suffixes of files that will be scanned
+for IDL implicit dependencies
+(#include or import lines).
+The default list is:
+
+.ES
+[".idl", ".IDL"]
+.EE
+
+.IP IMPLICIT_COMMAND_DEPENDENCIES
+Controls whether or not SCons will
+add implicit dependencies for the commands
+executed to build targets.
+
+By default, SCons will add
+to each target
+an implicit dependency on the command
+represented by the first argument on any
+command line it executes.
+The specific file for the dependency is
+found by searching the
+.I PATH
+variable in the
+.I ENV
+environment used to execute the command.
+
+If the construction variable
+.B $IMPLICIT_COMMAND_DEPENDENCIES
+is set to a false value
+.RB ( None ,
+.BR False ,
+.BR 0 ,
+etc.),
+then the implicit dependency will
+not be added to the targets
+built with that construction environment.
+
+.ES
+env = Environment(IMPLICIT_COMMAND_DEPENDENCIES = 0)
+.EE
+
+.IP INCPREFIX
+The prefix used to specify an include directory on the C compiler command
+line.
+This will be appended to the beginning of each directory
+in the \fB$CPPPATH\fP and \fB$FORTRANPATH\fP construction variables
+when the \fB$_CPPINCFLAGS\fP and \fB$_FORTRANINCFLAGS\fP
+variables are automatically generated.
+
+.IP INCSUFFIX
+The suffix used to specify an include directory on the C compiler command
+line.
+This will be appended to the end of each directory
+in the \fB$CPPPATH\fP and \fB$FORTRANPATH\fP construction variables
+when the \fB$_CPPINCFLAGS\fP and \fB$_FORTRANINCFLAGS\fP
+variables are automatically generated.
+
+.IP INSTALL
+A function to be called to install a file into a
+destination file name.
+The default function copies the file into the destination
+(and sets the destination file's mode and permission bits
+to match the source file's).
+The function takes the following arguments:
+
+.ES
+def install(dest, source, env):
+.EE
+.IP
+.I dest
+is the path name of the destination file.
+.I source
+is the path name of the source file.
+.I env
+is the construction environment
+(a dictionary of construction values)
+in force for this file installation.
+
+.IP INSTALLSTR
+The string displayed when a file is
+installed into a destination file name.
+The default is:
+.ES
+Install file: "$SOURCE" as "$TARGET"
+.EE
+
+.IP INTEL_C_COMPILER_VERSION
+Set by the "intelc" Tool
+to the major version number of the Intel C compiler
+selected for use.
+
+.IP JAR
+The Java archive tool.
+
+.IP JARCHDIR
+The directory to which the Java archive tool should change
+(using the
+.B \-C
+option).
+
+.IP JARCOM
+The command line used to call the Java archive tool.
+
+.IP JARCOMSTR
+The string displayed when the Java archive tool
+is called
+If this is not set, then \fB$JARCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(JARCOMSTR = "JARchiving $SOURCES into $TARGET")
+.EE
+
+.IP JARFLAGS
+General options passed to the Java archive tool.
+By default this is set to
+.B cf
+to create the necessary
+.B jar
+file.
+
+.IP JARSUFFIX
+The suffix for Java archives:
+.B .jar
+by default.
+
+.IP JAVABOOTCLASSPATH
+Specifies the list of directories that
+will be added to the
+&javac; command line
+via the \fB\-bootclasspath\fP option.
+The individual directory names will be
+separated by the operating system's path separate character
+(\fB:\fP on UNIX/Linux/POSIX,
+\fB;\fP on Windows).
+
+.IP JAVAC
+The Java compiler.
+
+.IP JAVACCOM
+The command line used to compile a directory tree containing
+Java source files to
+corresponding Java class files.
+Any options specified in the \fB$JAVACFLAGS\fP construction variable
+are included on this command line.
+
+.IP JAVACCOMSTR
+The string displayed when compiling
+a directory tree of Java source files to
+corresponding Java class files.
+If this is not set, then \fB$JAVACCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(JAVACCOMSTR = "Compiling class files $TARGETS from $SOURCES")
+.EE
+
+.IP JAVACFLAGS
+General options that are passed to the Java compiler.
+
+.IP JAVACLASSDIR
+The directory in which Java class files may be found.
+This is stripped from the beginning of any Java .class
+file names supplied to the
+.B JavaH
+builder.
+
+.IP JAVACLASSPATH
+Specifies the list of directories that
+will be searched for Java
+\fB.class\fP file.
+The directories in this list will be added to the
+&javac; and &javah; command lines
+via the \fB\-classpath\fP option.
+The individual directory names will be
+separated by the operating system's path separate character
+(\fB:\fP on UNIX/Linux/POSIX,
+\fB;\fP on Windows).
+
+Note that this currently just adds the specified
+directory via the \fB\-classpath\fP option.
+&SCons; does not currently search the
+\fB$JAVACLASSPATH\fP directories for dependency
+\fB.class\fP files.
+
+.IP JAVACLASSSUFFIX
+The suffix for Java class files;
+.B .class
+by default.
+
+.IP JAVAH
+The Java generator for C header and stub files.
+
+.IP JAVAHCOM
+The command line used to generate C header and stub files
+from Java classes.
+Any options specified in the \fB$JAVAHFLAGS\fP construction variable
+are included on this command line.
+
+.IP JAVAHCOMSTR
+The string displayed when C header and stub files
+are generated from Java classes.
+If this is not set, then \fB$JAVAHCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(JAVAHCOMSTR = "Generating header/stub file(s) $TARGETS from $SOURCES")
+.EE
+
+.IP JAVAHFLAGS
+General options passed to the C header and stub file generator
+for Java classes.
+
+.IP JAVASOURCEPATH
+Specifies the list of directories that
+will be searched for input
+\fB.java\fP file.
+The directories in this list will be added to the
+&javac; command line
+via the \fB\-sourcepath\fP option.
+The individual directory names will be
+separated by the operating system's path separate character
+(\fB:\fP on UNIX/Linux/POSIX,
+\fB;\fP on Windows).
+
+Note that this currently just adds the specified
+directory via the \fB\-sourcepath\fP option.
+&SCons; does not currently search the
+\fB$JAVASOURCEPATH\fP directories for dependency
+\fB.java\fP files.
+
+.IP JAVASUFFIX
+The suffix for Java files;
+.B .java
+by default.
+
+.IP JAVAVERSION
+Specifies the Java version being used by the \fBJava\fP() builder.
+This is \fInot\fP currently used to select one
+version of the Java compiler vs. another.
+Instead, you should set this to specify the version of Java
+supported by your &javac; compiler.
+The default is \fB1.4\fP.
+
+This is sometimes necessary because
+Java 1.5 changed the file names that are created
+for nested anonymous inner classes,
+which can cause a mismatch with the files
+that &SCons; expects will be generated by the &javac; compiler.
+Setting \fB$JAVAVERSION\fP to \fB1.5\fP
+(or \fB1.6\fP, as appropriate)
+can make &SCons; realize that a Java 1.5 or 1.6
+build is actually up to date.
+
+.IP LATEX
+The LaTeX structured formatter and typesetter.
+
+.IP LATEXCOM
+The command line used to call the LaTeX structured formatter and typesetter.
+
+.IP LATEXCOMSTR
+The string displayed when calling
+the LaTeX structured formatter and typesetter.
+If this is not set, then \fB$LATEXCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(LATEXCOMSTR = "Building $TARGET from LaTeX input $SOURCES")
+.EE
+
+.IP LATEXFLAGS
+General options passed to the LaTeX structured formatter and typesetter.
+
+.IP LATEXRETRIES
+The maximum number of times that LaTeX
+will be re-run if the
+.B .log
+generated by the \fB$LATEXCOM\fP command
+indicates that there are undefined references.
+The default is to try to resolve undefined references
+by re-running LaTeX up to three times.
+
+.IP LATEXSUFFIXES
+The list of suffixes of files that will be scanned
+for LaTeX implicit dependencies
+(\fB\\include\fP or \fB\\import\fP files).
+The default list is:
+
+.ES
+[".tex", ".ltx", ".latex"]
+.EE
+
+.IP LDMODULE
+The linker for building loadable modules.
+By default, this is the same as \fB$SHLINK\fP.
+
+.IP LDMODULECOM
+The command line for building loadable modules.
+On Mac OS X, this uses the \fB$LDMODULE\fP,
+\fB$LDMODULEFLAGS\fP and
+\fB$FRAMEWORKSFLAGS\fP variables.
+On other systems, this is the same as \fB$SHLINK\fP.
+
+.IP LDMODULECOMSTR
+The string displayed when building loadable modules.
+If this is not set, then \fB$LDMODULECOM\fP (the command line) is displayed.
+
+.IP LDMODULEFLAGS
+General user options passed to the linker for building loadable modules.
+
+.IP LDMODULEPREFIX
+The prefix used for loadable module file names.
+On Mac OS X, this is null;
+on other systems, this is
+the same as \fB$SHLIBPREFIX\fP.
+
+.IP LDMODULESUFFIX
+The suffix used for loadable module file names.
+On Mac OS X, this is null;
+on other systems, this is
+the same as $SHLIBSUFFIX.
+
+.IP LEX
+The lexical analyzer generator.
+
+.IP LEXCOM
+The command line used to call the lexical analyzer generator
+to generate a source file.
+
+.IP LEXCOMSTR
+The string displayed when generating a source file
+using the lexical analyzer generator.
+If this is not set, then \fB$LEXCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(LEXCOMSTR = "Lex'ing $TARGET from $SOURCES")
+.EE
+
+.IP LEXFLAGS
+General options passed to the lexical analyzer generator.
+
+.IP _LIBDIRFLAGS
+An automatically-generated construction variable
+containing the linker command-line options
+for specifying directories to be searched for library.
+The value of \fB$_LIBDIRFLAGS\fP is created
+by appending \fB$LIBDIRPREFIX\fP and \fB$LIBDIRSUFFIX\fP
+to the beginning and end
+of each directory in \fB$LIBPATH\fP.
+
+.IP LIBDIRPREFIX
+The prefix used to specify a library directory on the linker command line.
+This will be appended to the beginning of each directory
+in the \fB$LIBPATH\fP construction variable
+when the \fB$_LIBDIRFLAGS\fP variable is automatically generated.
+
+.IP LIBDIRSUFFIX
+The suffix used to specify a library directory on the linker command line.
+This will be appended to the end of each directory
+in the \fB$LIBPATH\fP construction variable
+when the \fB$_LIBDIRFLAGS\fP variable is automatically generated.
+
+.IP LIBEMITTER
+TODO
+
+.IP _LIBFLAGS
+An automatically-generated construction variable
+containing the linker command-line options
+for specifying libraries to be linked with the resulting target.
+The value of \fB$_LIBFLAGS\fP is created
+by appending \fB$LIBLINKPREFIX\fP and \fB$LIBLINKSUFFIX\fP
+to the beginning and end
+of each filename in \fB$LIBS\fP.
+
+.IP LIBLINKPREFIX
+The prefix used to specify a library to link on the linker command line.
+This will be appended to the beginning of each library
+in the \fB$LIBS\fP construction variable
+when the \fB$_LIBFLAGS\fP variable is automatically generated.
+
+.IP LIBLINKSUFFIX
+The suffix used to specify a library to link on the linker command line.
+This will be appended to the end of each library
+in the \fB$LIBS\fP construction variable
+when the \fB$_LIBFLAGS\fP variable is automatically generated.
+
+.IP LIBPATH
+The list of directories that will be searched for libraries.
+The implicit dependency scanner will search these
+directories for include files. Don't explicitly put include directory
+arguments in \fB$LINKFLAGS\fP or \fB$SHLINKFLAGS\fP
+because the result will be non-portable
+and the directories will not be searched by the dependency scanner. Note:
+directory names in LIBPATH will be looked-up relative to the SConscript
+directory when they are used in a command. To force
+.B scons
+to look-up a directory relative to the root of the source tree use #:
+
+.ES
+env = Environment(LIBPATH='#/libs')
+.EE
+.IP
+The directory look-up can also be forced using the
+.BR Dir ()
+function:
+
+.ES
+libs = Dir('libs')
+env = Environment(LIBPATH=libs)
+.EE
+.IP
+The directory list will be added to command lines
+through the automatically-generated
+.B $_LIBDIRFLAGS
+construction variable,
+which is constructed by
+appending the values of the
+.BR $LIBDIRPREFIX  and  $LIBDIRSUFFIX
+construction variables
+to the beginning and end
+of each directory in \fB$LIBPATH\fP.
+Any command lines you define that need
+the LIBPATH directory list should
+include \fB$_LIBDIRFLAGS\fP:
+
+.ES
+env = Environment(LINKCOM="my_linker $_LIBDIRFLAGS $_LIBFLAGS -o $TARGET $SOURCE")
+.EE
+
+.IP LIBPREFIX
+The prefix used for (static) library file names.
+A default value is set for each platform
+(posix, win32, os2, etc.),
+but the value is overridden by individual tools
+(ar, mslib, sgiar, sunar, tlib, etc.)
+to reflect the names of the libraries they create.
+
+.IP LIBPREFIXES
+A list of all legal prefixes for library file names.
+When searching for library dependencies,
+SCons will look for files with these prefixes,
+the base library name,
+and suffixes in the \fB$LIBSUFFIXES\fP list.
+
+.IP LIBS
+A list of one or more libraries
+that will be linked with
+any executable programs
+created by this environment.
+
+The library list will be added to command lines
+through the automatically-generated
+.B $_LIBFLAGS
+construction variable,
+which is constructed by
+appending the values of the
+.BR $LIBLINKPREFIX  and  $LIBLINKSUFFIX
+construction variables
+to the beginning and end
+of each filename in \fB$LIBS\fP.
+Any command lines you define that need
+the LIBS library list should
+include \fB$_LIBFLAGS\fP:
+
+.ES
+env = Environment(LINKCOM="my_linker $_LIBDIRFLAGS $_LIBFLAGS -o $TARGET $SOURCE")
+.EE
+.IP
+If you add a
+File
+object to the
+.B $LIBS
+list, the name of that file will be added to
+.BR $_LIBFLAGS ,
+and thus the link line, as is, without
+.B $LIBLINKPREFIX
+or
+.BR $LIBLINKSUFFIX .
+For example:
+
+.ES
+env.Append(LIBS=File('/tmp/mylib.so'))
+.EE
+.IP
+In all cases, scons will add dependencies from the executable program to
+all the libraries in this list.
+
+.IP LIBSUFFIX
+The suffix used for (static) library file names.
+A default value is set for each platform
+(posix, win32, os2, etc.),
+but the value is overridden by individual tools
+(ar, mslib, sgiar, sunar, tlib, etc.)
+to reflect the names of the libraries they create.
+
+.IP LIBSUFFIXES
+A list of all legal suffixes for library file names.
+When searching for library dependencies,
+SCons will look for files with prefixes, in the \fB$LIBPREFIXES\fP list,
+the base library name,
+and these suffixes.
+
+.IP LICENSE
+The abbreviated name of the license under which
+this project is released (gpl, lpgl, bsd etc.).
+See http://www.opensource.org/licenses/alphabetical
+for a list of license names.
+
+.IP LINESEPARATOR
+The separator used by the \fBSubstfile\fP() and \fBTextfile\fP() builders.
+This value is used between sources when constructing the target.
+It defaults to the current system line separator.
+
+.IP LINGUAS_FILE
+The \fB$LINGUAS_FILE\fP defines file(s) containing list of additional linguas
+to be processed by \fBPOInit\fP(), \fBPOUpdate\fP() or \fBMOFiles\fP()
+builders. It also affects \fBTranslate\fP() builder. If the variable contains
+a string, it defines name of the list file. The \fB$LINGUAS_FILE\fP may be a
+list of file names as well. If \fB$LINGUAS_FILE\fP is set to
+\fBTrue\fP (or non-zero numeric value), the list will be read from
+default file named
+.BR LINGUAS .
+
+
+.IP LINK
+The linker.
+
+.IP LINKCOM
+The command line used to link object files into an executable.
+
+.IP LINKCOMSTR
+The string displayed when object files
+are linked into an executable.
+If this is not set, then \fB$LINKCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(LINKCOMSTR = "Linking $TARGET")
+.EE
+
+.IP LINKFLAGS
+General user options passed to the linker.
+Note that this variable should
+.I not
+contain
+.B \-l
+(or similar) options for linking with the libraries listed in \fB$LIBS\fP,
+nor
+.B \-L
+(or similar) library search path options
+that scons generates automatically from \fB$LIBPATH\fP.
+See
+.B $_LIBFLAGS
+above,
+for the variable that expands to library-link options,
+and
+.B $_LIBDIRFLAGS
+above,
+for the variable that expands to library search path options.
+
+.IP M4
+The M4 macro preprocessor.
+
+.IP M4COM
+The command line used to pass files through the M4 macro preprocessor.
+
+.IP M4COMSTR
+The string displayed when
+a file is passed through the M4 macro preprocessor.
+If this is not set, then \fB$M4COM\fP (the command line) is displayed.
+
+.IP M4FLAGS
+General options passed to the M4 macro preprocessor.
+
+.IP MAKEINDEX
+The makeindex generator for the TeX formatter and typesetter and the
+LaTeX structured formatter and typesetter.
+
+.IP MAKEINDEXCOM
+The command line used to call the makeindex generator for the
+TeX formatter and typesetter and the LaTeX structured formatter and
+typesetter.
+
+.IP MAKEINDEXCOMSTR
+The string displayed when calling the makeindex generator for the
+TeX formatter and typesetter
+and the LaTeX structured formatter and typesetter.
+If this is not set, then \fB$MAKEINDEXCOM\fP (the command line) is displayed.
+
+.IP MAKEINDEXFLAGS
+General options passed to the makeindex generator for the TeX formatter
+and typesetter and the LaTeX structured formatter and typesetter.
+
+.IP MAXLINELENGTH
+The maximum number of characters allowed on an external command line.
+On Win32 systems,
+link lines longer than this many characters
+are linked via a temporary file name.
+
+.IP MIDL
+The Microsoft IDL compiler.
+
+.IP MIDLCOM
+The command line used to pass files to the Microsoft IDL compiler.
+
+.IP MIDLCOMSTR
+The string displayed when
+the Microsoft IDL copmiler is called.
+If this is not set, then \fB$MIDLCOM\fP (the command line) is displayed.
+
+.IP MIDLFLAGS
+General options passed to the Microsoft IDL compiler.
+
+.IP MOSUFFIX
+Suffix used for \fBMO\fP files (default: \fB'.mo'\fP).
+See &t-link-msgfmt; tool and \fBMOFiles\fP() builder.
+
+.IP MSGFMT
+Absolute path to \fBmsgfmt(1)\fP binary, found by
+.BR Detect() .
+See &t-link-msgfmt; tool and \fBMOFiles\fP() builder.
+
+.IP MSGFMTCOM
+Complete command line to run \fBmsgfmt(1)\fP program.
+See &t-link-msgfmt; tool and \fBMOFiles\fP() builder.
+
+.IP MSGFMTCOMSTR
+String to display when \fBmsgfmt(1)\fP is invoked 
+(default: \fB''\fP, which means ``print \fB$MSGFMTCOM\fP'').
+See &t-link-msgfmt; tool and \fBMOFiles\fP() builder.
+
+.IP MSGFMTFLAGS
+Additional flags to \fBmsgfmt(1)\fP.
+See &t-link-msgfmt; tool and \fBMOFiles\fP() builder.
+
+.IP MSGINIT
+Path to \fBmsginit(1)\fP program (found via
+.BR Detect() ).
+See &t-link-msginit; tool and \fBPOInit\fP() builder.
+
+.IP MSGINITCOM
+Complete command line to run \fBmsginit(1)\fP program.
+See &t-link-msginit; tool and \fBPOInit\fP() builder.
+
+.IP MSGINITCOMSTR
+String to display when \fBmsginit(1)\fP is invoked 
+(default: \fB''\fP, which means ``print \fB$MSGINITCOM\fP'').
+See &t-link-msginit; tool and \fBPOInit\fP() builder.
+
+.IP MSGINITFLAGS
+List of additional flags to \fBmsginit(1)\fP (default:
+.BR [] ).
+See &t-link-msginit; tool and \fBPOInit\fP() builder.
+
+.IP _MSGINITLOCALE
+Internal ``macro''. Computes locale (language) name based on target filename
+(default: \fB'${TARGET.filebase}' \fP).
+
+.IP MSGMERGE
+Absolute path to \fBmsgmerge(1)\fP binary as found by
+.BR Detect() .
+See &t-link-msgmerge; tool and \fBPOUpdate\fP() builder.
+
+.IP MSGMERGECOM
+Complete command line to run \fBmsgmerge(1)\fP command.
+See &t-link-msgmerge; tool and \fBPOUpdate\fP() builder.
+
+.IP MSGMERGECOMSTR
+String to be displayed when \fBmsgmerge(1)\fP is invoked
+(default: \fB''\fP, which means ``print \fB$MSGMERGECOM\fP'').
+See &t-link-msgmerge; tool and \fBPOUpdate\fP() builder.
+
+.IP MSGMERGEFLAGS
+Additional flags to \fBmsgmerge(1)\fP command.
+See &t-link-msgmerge; tool and \fBPOUpdate\fP() builder.
+
+.IP MSSDK_DIR
+The directory containing the Microsoft SDK
+(either Platform SDK or Windows SDK)
+to be used for compilation.
+
+.IP MSSDK_VERSION
+The version string of the Microsoft SDK
+(either Platform SDK or Windows SDK)
+to be used for compilation.
+Supported versions include
+.BR 6.1 ,
+.BR 6.0A ,
+.BR 6.0 ,
+.B 2003R2
+and 
+.BR 2003R1 .
+
+.IP MSVC_BATCH
+When set to any true value,
+specifies that SCons should batch
+compilation of object files
+when calling the Microsoft Visual C/C++ compiler.
+All compilations of source files from the same source directory
+that generate target files in a same output directory
+and were configured in SCons using the same construction environment
+will be built in a single call to the compiler.
+Only source files that have changed since their
+object files were built will be passed to each compiler invocation
+(via the \fB$CHANGED_SOURCES\fP construction variable).
+Any compilations where the object (target) file base name
+(minus the \fB.obj\fP)
+does not match the source file base name
+will be compiled separately.
+
+.IP MSVC_USE_SCRIPT
+Use a batch script to set up Microsoft Visual Studio compiler
+
+.BR $MSVC_USE_SCRIPT\fP overrides \fB$MSVC_VERSION\fP and \fB$TARGET_ARCH .
+If set to the name of a Visual Studio .bat file (e.g. vcvars.bat),
+SCons will run that bat file and extract the relevant variables from
+the result (typically %INCLUDE%, %LIB%, and %PATH%).  Setting
+MSVC_USE_SCRIPT to None bypasses the Visual Studio autodetection
+entirely; use this if you are running SCons in a Visual Studio cmd
+window and importing the shell's environment variables.
+
+.IP MSVC_VERSION
+Sets the preferred  version of Microsoft Visual C/C++ to use.
+
+If \fB$MSVC_VERSION\fP is not set, SCons will (by default) select the
+latest version of Visual C/C++ installed on your system.  If the
+specified version isn't installed, tool initialization will fail.
+This variable must be passed as an argument to the Environment()
+constructor; setting it later has no effect.  Set it to an unexpected
+value (e.g. "XXX") to see the valid values on your system.
+
+.IP MSVS
+When the Microsoft Visual Studio tools are initialized, they set up
+this dictionary with the following keys:
+
+.BR VERSION :
+the version of MSVS being used (can be set via
+.BR $MSVS_VERSION )
+
+.BR VERSIONS :
+the available versions of MSVS installed
+
+.BR VCINSTALLDIR :
+installed directory of Visual C++
+
+.BR VSINSTALLDIR :
+installed directory of Visual Studio
+
+.BR FRAMEWORKDIR :
+installed directory of the .NET framework
+
+.BR FRAMEWORKVERSIONS :
+list of installed versions of the .NET framework, sorted latest to oldest.
+
+.BR FRAMEWORKVERSION :
+latest installed version of the .NET framework
+
+.BR FRAMEWORKSDKDIR :
+installed location of the .NET SDK.
+
+.BR PLATFORMSDKDIR :
+installed location of the Platform SDK.
+
+.BR PLATFORMSDK_MODULES :
+dictionary of installed Platform SDK modules,
+where the dictionary keys are keywords for the various modules, and
+the values are 2-tuples where the first is the release date, and the
+second is the version number.
+
+If a value isn't set, it wasn't available in the registry.
+
+.IP MSVS_ARCH
+Sets the architecture for which the generated project(s) should build.
+
+The default value is \fBx86\fP.
+\fBamd64\fP is also supported
+by &SCons; for some Visual Studio versions.
+Trying to set \fB$MSVS_ARCH\fP to an architecture that's not
+supported for a given Visual Studio version
+will generate an error.
+
+.IP MSVS_PROJECT_GUID
+The string
+placed in a generated Microsoft Visual Studio project file
+as the value of the
+.B ProjectGUID
+attribute.
+There is no default value. If not defined, a new GUID is generated.
+
+.IP MSVS_SCC_AUX_PATH
+The path name
+placed in a generated Microsoft Visual Studio project file
+as the value of the
+.B SccAuxPath
+attribute
+if the
+.B MSVS_SCC_PROVIDER
+construction variable is also set.
+There is no default value.
+
+.IP MSVS_SCC_CONNECTION_ROOT
+The root path of projects in your SCC workspace, i.e the path under which
+all project and solution files will be generated. It is used as a
+reference path from which the relative paths of the generated
+Microsoft Visual Studio project and solution files are computed.
+The relative project file path is placed as the value of the
+.B SccLocalPath
+attribute
+of the project file
+and as the values of the
+.B SccProjectFilePathRelativizedFromConnection[i]
+(where [i] ranges from 0 to the number of projects in the solution)
+attributes of the
+.B GlobalSection(SourceCodeControl)
+section of the Microsoft Visual Studio solution file.
+Similarly the relative solution file path is placed as the values of the
+.B SccLocalPath[i]
+(where [i] ranges from 0 to the number of projects in the solution)
+attributes of the
+.B GlobalSection(SourceCodeControl)
+section of the Microsoft Visual Studio solution file.
+This is used only
+if the
+.B MSVS_SCC_PROVIDER
+construction variable is also set.
+The default value is the current working directory.
+
+.IP MSVS_SCC_PROJECT_NAME
+The project name
+placed in a generated Microsoft Visual Studio project file
+as the value of the
+.B SccProjectName
+attribute
+if the
+.B MSVS_SCC_PROVIDER
+construction variable is also set.
+In this case the string is also placed in the
+.B SccProjectName0
+attribute of the
+.B GlobalSection(SourceCodeControl)
+section of the Microsoft Visual Studio solution file.
+There is no default value.
+
+.IP MSVS_SCC_PROVIDER
+The string
+placed in a generated Microsoft Visual Studio project file
+as the value of the
+.B SccProvider
+attribute.
+The string is also placed in the
+.B SccProvider0
+attribute of the
+.B GlobalSection(SourceCodeControl)
+section of the Microsoft Visual Studio solution file.
+There is no default value.
+
+.IP MSVS_VERSION
+Sets the preferred version of Microsoft Visual Studio to use.
+
+If \fB$MSVS_VERSION\fP is not set,
+&SCons; will (by default) select the latest version
+of Visual Studio installed on your system.
+So, if you have version 6 and version 7 (MSVS .NET) installed,
+it will prefer version 7.
+You can override this by
+specifying the
+.B MSVS_VERSION
+variable in the Environment initialization, setting it to the
+appropriate version ('6.0' or '7.0', for example).
+If the specified version isn't installed,
+tool initialization will fail.
+
+This is obsolete: use \fB$MSVC_VERSION\fP instead. If \fB$MSVS_VERSION\fP is set and
+.BR $MSVC_VERSION\fP is not, \fB$MSVC_VERSION\fP will be set automatically to \fB$MSVS_VERSION .
+If both are set to different values, scons will raise an error.
+
+.IP MSVSBUILDCOM
+The build command line placed in
+a generated Microsoft Visual Studio project file.
+The default is to have Visual Studio invoke SCons with any specified
+build targets.
+
+.IP MSVSCLEANCOM
+The clean command line placed in
+a generated Microsoft Visual Studio project file.
+The default is to have Visual Studio invoke SCons with the -c option
+to remove any specified targets.
+
+.IP MSVSENCODING
+The encoding string placed in
+a generated Microsoft Visual Studio project file.
+The default is encoding
+.BR Windows-1252 .
+
+.IP MSVSPROJECTCOM
+The action used to generate Microsoft Visual Studio project files.
+
+.IP MSVSPROJECTSUFFIX
+The suffix used for Microsoft Visual Studio project (DSP) files.
+The default value is
+.B .vcproj
+when using Visual Studio version 7.x (.NET)
+or later version,
+and
+.B .dsp
+when using earlier versions of Visual Studio.
+
+.IP MSVSREBUILDCOM
+The rebuild command line placed in
+a generated Microsoft Visual Studio project file.
+The default is to have Visual Studio invoke SCons with any specified
+rebuild targets.
+
+.IP MSVSSCONS
+The SCons used in generated Microsoft Visual Studio project files.
+The default is the version of SCons being
+used to generate the project file.
+
+.IP MSVSSCONSCOM
+The default SCons command used in generated Microsoft Visual Studio
+project files.
+
+.IP MSVSSCONSCRIPT
+The sconscript file
+(that is,
+.B SConstruct
+or
+.B SConscript
+file)
+that will be invoked by Visual Studio
+project files
+(through the
+.B $MSVSSCONSCOM
+variable).
+The default is the same sconscript file
+that contains the call to
+.BR MSVSProject ()
+to build the project file.
+
+.IP MSVSSCONSFLAGS
+The SCons flags used in generated Microsoft Visual Studio
+project files.
+
+.IP MSVSSOLUTIONCOM
+The action used to generate Microsoft Visual Studio solution files.
+
+.IP MSVSSOLUTIONSUFFIX
+The suffix used for Microsoft Visual Studio solution (DSW) files.
+The default value is
+.B .sln
+when using Visual Studio version 7.x (.NET),
+and
+.B .dsw
+when using earlier versions of Visual Studio.
+
+.IP MT
+The program used on Windows systems to embed manifests into DLLs and EXEs.
+See also \fB$WINDOWS_EMBED_MANIFEST\fP.
+
+.IP MTEXECOM
+The Windows command line used to embed manifests into executables.
+See also \fB$MTSHLIBCOM\fP.
+
+.IP MTFLAGS
+Flags passed to the \fB$MT\fP manifest embedding program (Windows only).
+
+.IP MTSHLIBCOM
+The Windows command line used to embed manifests into shared libraries (DLLs).
+See also \fB$MTEXECOM\fP.
+
+.IP MWCW_VERSION
+The version number of the MetroWerks CodeWarrior C compiler
+to be used.
+
+.IP MWCW_VERSIONS
+A list of installed versions of the MetroWerks CodeWarrior C compiler
+on this system.
+
+.IP NAME
+Specfies the name of the project to package.
+
+.IP no_import_lib
+When set to non-zero,
+suppresses creation of a corresponding Windows static import lib by the
+.B SharedLibrary
+builder when used with
+MinGW, Microsoft Visual Studio or Metrowerks.
+This also suppresses creation
+of an export (.exp) file
+when using Microsoft Visual Studio.
+
+.IP OBJPREFIX
+The prefix used for (static) object file names.
+
+.IP OBJSUFFIX
+The suffix used for (static) object file names.
+
+.IP P4
+The Perforce executable.
+
+.IP P4COM
+The command line used to
+fetch source files from Perforce.
+
+.IP P4COMSTR
+The string displayed when
+fetching a source file from Perforce.
+If this is not set, then \fB$P4COM\fP (the command line) is displayed.
+
+.IP P4FLAGS
+General options that are passed to Perforce.
+
+.IP PACKAGEROOT
+Specifies the directory where all files in resulting archive will be
+placed if applicable.  The default value is "$NAME-$VERSION".
+
+.IP PACKAGETYPE
+Selects the package type to build.  Currently these are available:
+
+ * msi - Microsoft Installer
+ * rpm - Redhat Package Manger
+ * ipkg - Itsy Package Management System
+ * tarbz2 - compressed tar
+ * targz - compressed tar
+ * zip - zip file
+ * src_tarbz2 - compressed tar source
+ * src_targz - compressed tar source
+ * src_zip - zip file source
+
+This may be overridden with the "package_type" command line option.
+
+.IP PACKAGEVERSION
+The version of the package (not the underlying project).
+This is currently only used by the rpm packager
+and should reflect changes in the packaging,
+not the underlying project code itself.
+
+.IP PCH
+The Microsoft Visual C++ precompiled header that will be used when compiling
+object files. This variable is ignored by tools other than Microsoft Visual C++.
+When this variable is
+defined SCons will add options to the compiler command line to
+cause it to use the precompiled header, and will also set up the
+dependencies for the PCH file.
+Example:
+
+.ES
+env['PCH'] = 'StdAfx.pch'
+.EE
+
+.IP PCHCOM
+The command line used by the
+.BR PCH ()
+builder to generated a precompiled header.
+
+.IP PCHCOMSTR
+The string displayed when generating a precompiled header.
+If this is not set, then \fB$PCHCOM\fP (the command line) is displayed.
+
+.IP PCHPDBFLAGS
+A construction variable that, when expanded,
+adds the \fB/yD\fP flag to the command line
+only if the \fB$PDB\fP construction variable is set.
+
+.IP PCHSTOP
+This variable specifies how much of a source file is precompiled. This
+variable is ignored by tools other than Microsoft Visual C++, or when
+the PCH variable is not being used. When this variable is define it
+must be a string that is the name of the header that
+is included at the end of the precompiled portion of the source files, or
+the empty string if the "#pragma hrdstop" construct is being used:
+
+.ES
+env['PCHSTOP'] = 'StdAfx.h'
+.EE
+
+.IP PDB
+The Microsoft Visual C++ PDB file that will store debugging information for
+object files, shared libraries, and programs. This variable is ignored by
+tools other than Microsoft Visual C++.
+When this variable is
+defined SCons will add options to the compiler and linker command line to
+cause them to generate external debugging information, and will also set up the
+dependencies for the PDB file.
+Example:
+
+.ES
+env['PDB'] = 'hello.pdb'
+.EE
+.IP
+The Visual C++ compiler switch that SCons uses by default
+to generate PDB information is \fB/Z7\fP.
+This works correctly with parallel (\fB\-j\fP) builds
+because it embeds the debug information in the intermediate object files,
+as opposed to sharing a single PDB file between multiple object files.
+This is also the only way to get debug information
+embedded into a static library.
+Using the \fB/Zi\fP instead may yield improved
+link-time performance,
+although parallel builds will no longer work.
+You can generate PDB files with the \fB/Zi\fP
+switch by overriding the default \fB$CCPDBFLAGS\fP variable;
+see the entry for that variable for specific examples.
+
+.IP PDFCOM
+A deprecated synonym for \fB$DVIPDFCOM\fP.
+
+.IP PDFLATEX
+The &pdflatex; utility.
+
+.IP PDFLATEXCOM
+The command line used to call the &pdflatex; utility.
+
+.IP PDFLATEXCOMSTR
+The string displayed when calling the &pdflatex; utility.
+If this is not set, then \fB$PDFLATEXCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(PDFLATEX;COMSTR = "Building $TARGET from LaTeX input $SOURCES")
+.EE
+
+.IP PDFLATEXFLAGS
+General options passed to the &pdflatex; utility.
+
+.IP PDFPREFIX
+The prefix used for PDF file names.
+
+.IP PDFSUFFIX
+The suffix used for PDF file names.
+
+.IP PDFTEX
+The &pdftex; utility.
+
+.IP PDFTEXCOM
+The command line used to call the &pdftex; utility.
+
+.IP PDFTEXCOMSTR
+The string displayed when calling the &pdftex; utility.
+If this is not set, then \fB$PDFTEXCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(PDFTEXCOMSTR = "Building $TARGET from TeX input $SOURCES")
+.EE
+
+.IP PDFTEXFLAGS
+General options passed to the &pdftex; utility.
+
+.IP PKGCHK
+On Solaris systems,
+the package-checking program that will
+be used (along with \fB$PKGINFO\fP)
+to look for installed versions of
+the Sun PRO C++ compiler.
+The default is
+.BR /usr/sbin/pgkchk .
+
+.IP PKGINFO
+On Solaris systems,
+the package information program that will
+be used (along with \fB$PKGCHK\fP)
+to look for installed versions of
+the Sun PRO C++ compiler.
+The default is
+.BR pkginfo .
+
+.IP PLATFORM
+The name of the platform used to create the Environment.  If no platform is
+specified when the Environment is created,
+.B scons
+autodetects the platform.
+
+.ES
+env = Environment(tools = [])
+if env['PLATFORM'] == 'cygwin':
+    Tool('mingw')(env)
+else:
+    Tool('msvc')(env)
+.EE
+
+.IP POAUTOINIT
+The \fB$POAUTOINIT\fP variable, if set to \fBTrue\fP (on non-zero
+numeric value), let the &t-link-msginit; tool to automatically initialize
+\fImissing\fP \fBPO\fP files with
+\fBmsginit(1)\fP.  This applies to both,
+\fBPOInit\fP() and \fBPOUpdate\fP() builders (and others that use any of
+them).
+
+.IP POCREATE_ALIAS
+Common alias for all \fBPO\fP files created with \fBPOInit\fP()
+builder (default: \fB'po-create'\fP).
+See &t-link-msginit; tool and \fBPOInit\fP() builder.
+
+.IP POSUFFIX
+Suffix used for \fBPO\fP files (default: \fB'.po'\fP)
+See &t-link-msginit; tool and \fBPOInit\fP() builder.
+
+.IP POTDOMAIN
+The \fB$POTDOMAIN\fP defines default domain, used to generate
+\fBPOT\fP filename as \fB\fB$POTDOMAIN\fP.pot\fP when
+no \fBPOT\fP file name is provided by the user. This applies to
+\fBPOTUpdate\fP(), \fBPOInit\fP() and \fBPOUpdate\fP() builders (and
+builders, that use them, e.g. \fBTranslate\fP()). Normally (if \fB$POTDOMAIN\fP is
+not defined), the builders use \fBmessages.pot\fP as default
+\fBPOT\fP file name.
+
+.IP POTSUFFIX
+Suffix used for PO Template files (default: \fB'.pot'\fP).
+See &t-link-xgettext; tool and \fBPOTUpdate\fP() builder.
+
+.IP POTUPDATE_ALIAS
+Name of the common phony target for all PO Templates created with
+.BR POUpdate\fP() (default: \fB'pot-update' ).
+See &t-link-xgettext; tool and \fBPOTUpdate\fP() builder.
+
+.IP POUPDATE_ALIAS
+Common alias for all \fBPO\fP files being defined with
+.BR POUpdate\fP() builder (default: \fB'po-update' ).
+See &t-link-msgmerge; tool and \fBPOUpdate\fP() builder.
+
+.IP PRINT_CMD_LINE_FUNC
+A Python function used to print the command lines as they are executed
+(assuming command printing is not disabled by the
+.B \-q
+or
+.B \-s
+options or their equivalents).
+The function should take four arguments:
+.IR s ,
+the command being executed (a string),
+.IR target ,
+the target being built (file node, list, or string name(s)),
+.IR source ,
+the source(s) used (file node, list, or string name(s)), and
+.IR env ,
+the environment being used.
+
+The function must do the printing itself.  The default implementation,
+used if this variable is not set or is None, is:
+.ES
+def print_cmd_line(s, target, source, env):
+  sys.stdout.write(s + "\\n")
+.EE
+.IP
+Here's an example of a more interesting function:
+
+.ES
+def print_cmd_line(s, target, source, env):
+   sys.stdout.write("Building %s -> %s...\\n" %
+    (' and '.join([str(x) for x in source]),
+     ' and '.join([str(x) for x in target])))
+env=Environment(PRINT_CMD_LINE_FUNC=print_cmd_line)
+env.Program('foo', 'foo.c')
+.EE
+.IP
+This just prints "Building \fItargetname\fP from \fIsourcename\fP..." instead
+of the actual commands.
+Such a function could also log the actual commands to a log file,
+for example.
+
+.IP PROGEMITTER
+TODO
+
+.IP PROGPREFIX
+The prefix used for executable file names.
+
+.IP PROGSUFFIX
+The suffix used for executable file names.
+
+.IP PSCOM
+The command line used to convert TeX DVI files into a PostScript file.
+
+.IP PSCOMSTR
+The string displayed when a TeX DVI file
+is converted into a PostScript file.
+If this is not set, then \fB$PSCOM\fP (the command line) is displayed.
+
+.IP PSPREFIX
+The prefix used for PostScript file names.
+
+.IP PSSUFFIX
+The prefix used for PostScript file names.
+
+.IP QT_AUTOSCAN
+Turn off scanning for mocable files. Use the Moc Builder to explicitly
+specify files to run moc on.
+
+.IP QT_BINPATH
+The path where the qt binaries are installed.
+The default value is '\fB$QTDIR\fP/bin'.
+
+.IP QT_CPPPATH
+The path where the qt header files are installed.
+The default value is '\fB$QTDIR\fP/include'.
+Note: If you set this variable to None,
+the tool won't change the \fB$CPPPATH\fP
+construction variable.
+
+.IP QT_DEBUG
+Prints lots of debugging information while scanning for moc files.
+
+.IP QT_LIB
+Default value is 'qt'. You may want to set this to 'qt-mt'. Note: If you set
+this variable to None, the tool won't change the \fB$LIBS\fP variable.
+
+.IP QT_LIBPATH
+The path where the qt libraries are installed.
+The default value is '\fB$QTDIR\fP/lib'.
+Note: If you set this variable to None,
+the tool won't change the \fB$LIBPATH\fP
+construction variable.
+
+.IP QT_MOC
+Default value is '\fB$QT_BINPATH\fP/moc'.
+
+.IP QT_MOCCXXPREFIX
+Default value is ''. Prefix for moc output files, when source is a cxx file.
+
+.IP QT_MOCCXXSUFFIX
+Default value is '.moc'. Suffix for moc output files, when source is a cxx
+file.
+
+.IP QT_MOCFROMCXXCOM
+Command to generate a moc file from a cpp file.
+
+.IP QT_MOCFROMCXXCOMSTR
+The string displayed when generating a moc file from a cpp file.
+If this is not set, then \fB$QT_MOCFROMCXXCOM\fP (the command line) is displayed.
+
+.IP QT_MOCFROMCXXFLAGS
+Default value is '-i'. These flags are passed to moc, when moccing a
+C++ file.
+
+.IP QT_MOCFROMHCOM
+Command to generate a moc file from a header.
+
+.IP QT_MOCFROMHCOMSTR
+The string displayed when generating a moc file from a cpp file.
+If this is not set, then \fB$QT_MOCFROMHCOM\fP (the command line) is displayed.
+
+.IP QT_MOCFROMHFLAGS
+Default value is ''. These flags are passed to moc, when moccing a header
+file.
+
+.IP QT_MOCHPREFIX
+Default value is 'moc_'. Prefix for moc output files, when source is a header.
+
+.IP QT_MOCHSUFFIX
+Default value is '\fB$CXXFILESUFFIX\fP'. Suffix for moc output files, when source is
+a header.
+
+.IP QT_UIC
+Default value is '\fB$QT_BINPATH\fP/uic'.
+
+.IP QT_UICCOM
+Command to generate header files from .ui files.
+
+.IP QT_UICCOMSTR
+The string displayed when generating header files from .ui files.
+If this is not set, then \fB$QT_UICCOM\fP (the command line) is displayed.
+
+.IP QT_UICDECLFLAGS
+Default value is ''. These flags are passed to uic, when creating a a h
+file from a .ui file.
+
+.IP QT_UICDECLPREFIX
+Default value is ''. Prefix for uic generated header files.
+
+.IP QT_UICDECLSUFFIX
+Default value is '.h'. Suffix for uic generated header files.
+
+.IP QT_UICIMPLFLAGS
+Default value is ''. These flags are passed to uic, when creating a cxx
+file from a .ui file.
+
+.IP QT_UICIMPLPREFIX
+Default value is 'uic_'. Prefix for uic generated implementation files.
+
+.IP QT_UICIMPLSUFFIX
+Default value is '\fB$CXXFILESUFFIX\fP'. Suffix for uic generated implementation
+files.
+
+.IP QT_UISUFFIX
+Default value is '.ui'. Suffix of designer input files.
+
+.IP QTDIR
+The qt tool tries to take this from os.environ.
+It also initializes all QT_*
+construction variables listed below.
+(Note that all paths are constructed
+with python's os.path.join() method,
+but are listed here with the '/' separator
+for easier reading.)
+In addition, the construction environment
+variables \fB$CPPPATH\fP,
+\fB$LIBPATH\fP and
+\fB$LIBS\fP may be modified
+and the variables
+.BR $PROGEMITTER\fP, \fB$SHLIBEMITTER  and  $LIBEMITTER
+are modified. Because the build-performance is affected when using this tool,
+you have to explicitly specify it at Environment creation:
+
+.ES
+Environment(tools=['default','qt'])
+.EE
+.IP
+The qt tool supports the following operations:
+
+.I "Automatic moc file generation from header files."
+You do not have to specify moc files explicitly, the tool does it for you.
+However, there are a few preconditions to do so: Your header file must have
+the same filebase as your implementation file and must stay in the same
+directory. It must have one of the suffixes .h, .hpp, .H, .hxx, .hh. You
+can turn off automatic moc file generation by setting QT_AUTOSCAN to 0.
+See also the corresponding
+.BR Moc() ()
+builder method.
+
+.I "Automatic moc file generation from cxx files."
+As stated in the qt documentation, include the moc file at the end of
+the cxx file. Note that you have to include the file, which is generated
+by the transformation ${QT_MOCCXXPREFIX}<basename>${QT_MOCCXXSUFFIX}, by default
+<basename>.moc. A warning is generated after building the moc file, if you
+do not include the correct file. If you are using VariantDir, you may
+need to specify duplicate=1. You can turn off automatic moc file generation
+by setting QT_AUTOSCAN to 0. See also the corresponding
+.BR Moc ()
+builder method.
+
+.I "Automatic handling of .ui files."
+The implementation files generated from .ui files are handled much the same
+as yacc or lex files. Each .ui file given as a source of Program, Library or
+SharedLibrary will generate three files, the declaration file, the
+implementation file and a moc file. Because there are also generated headers,
+you may need to specify duplicate=1 in calls to VariantDir.
+See also the corresponding
+.BR Uic ()
+builder method.
+
+.IP RANLIB
+The archive indexer.
+
+.IP RANLIBCOM
+The command line used to index a static library archive.
+
+.IP RANLIBCOMSTR
+The string displayed when a static library archive is indexed.
+If this is not set, then \fB$RANLIBCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(RANLIBCOMSTR = "Indexing $TARGET")
+.EE
+
+.IP RANLIBFLAGS
+General options passed to the archive indexer.
+
+.IP RC
+The resource compiler used to build
+a Microsoft Visual C++ resource file.
+
+.IP RCCOM
+The command line used to build
+a Microsoft Visual C++ resource file.
+
+.IP RCCOMSTR
+The string displayed when invoking the resource compiler
+to build a Microsoft Visual C++ resource file.
+If this is not set, then \fB$RCCOM\fP (the command line) is displayed.
+
+.IP RCFLAGS
+The flags passed to the resource compiler by the RES builder.
+
+.IP RCINCFLAGS
+An automatically-generated construction variable
+containing the command-line options
+for specifying directories to be searched
+by the resource compiler.
+The value of \fB$RCINCFLAGS\fP is created
+by appending \fB$RCINCPREFIX\fP and \fB$RCINCSUFFIX\fP
+to the beginning and end
+of each directory in \fB$CPPPATH\fP.
+
+.IP RCINCPREFIX
+The prefix (flag) used to specify an include directory
+on the resource compiler command line.
+This will be appended to the beginning of each directory
+in the \fB$CPPPATH\fP construction variable
+when the \fB$RCINCFLAGS\fP variable is expanded.
+
+.IP RCINCSUFFIX
+The suffix used to specify an include directory
+on the resource compiler command line.
+This will be appended to the end of each directory
+in the \fB$CPPPATH\fP construction variable
+when the \fB$RCINCFLAGS\fP variable is expanded.
+
+.IP RCS
+The RCS executable.
+Note that this variable is not actually used
+for the command to fetch source files from RCS;
+see the
+.B $RCS_CO
+construction variable, below.
+
+.IP RCS_CO
+The RCS "checkout" executable,
+used to fetch source files from RCS.
+
+.IP RCS_COCOM
+The command line used to
+fetch (checkout) source files from RCS.
+
+.IP RCS_COCOMSTR
+The string displayed when fetching
+a source file from RCS.
+If this is not set, then \fB$RCS_COCOM\fP
+(the command line) is displayed.
+
+.IP RCS_COFLAGS
+Options that are passed to the \fB$RCS_CO\fP command.
+
+.IP RDirs
+A function that converts a string into a list of Dir instances by
+searching the repositories.
+
+.IP REGSVR
+The program used on Windows systems
+to register a newly-built DLL library
+whenever the \fBSharedLibrary\fP() builder
+is passed a keyword argument of \fBregister=1\fP.
+
+.IP REGSVRCOM
+The command line used on Windows systems
+to register a newly-built DLL library
+whenever the \fBSharedLibrary\fP() builder
+is passed a keyword argument of \fBregister=1\fP.
+
+.IP REGSVRCOMSTR
+The string displayed when registering a newly-built DLL file.
+If this is not set, then \fB$REGSVRCOM\fP (the command line) is displayed.
+
+.IP REGSVRFLAGS
+Flags passed to the DLL registration program
+on Windows systems when a newly-built DLL library is registered.
+By default,
+this includes the \fB/s\fP
+that prevents dialog boxes from popping up
+and requiring user attention.
+
+.IP RMIC
+The Java RMI stub compiler.
+
+.IP RMICCOM
+The command line used to compile stub
+and skeleton class files
+from Java classes that contain RMI implementations.
+Any options specified in the \fB$RMICFLAGS\fP construction variable
+are included on this command line.
+
+.IP RMICCOMSTR
+The string displayed when compiling
+stub and skeleton class files
+from Java classes that contain RMI implementations.
+If this is not set, then \fB$RMICCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(RMICCOMSTR = "Generating stub/skeleton class files $TARGETS from $SOURCES")
+.EE
+
+.IP RMICFLAGS
+General options passed to the Java RMI stub compiler.
+
+.IP _RPATH
+An automatically-generated construction variable
+containing the rpath flags to be used when linking
+a program with shared libraries.
+The value of \fB$_RPATH\fP is created
+by appending \fB$RPATHPREFIX\fP and \fB$RPATHSUFFIX\fP
+to the beginning and end
+of each directory in \fB$RPATH\fP.
+
+.IP RPATH
+A list of paths to search for shared libraries when running programs.
+Currently only used in the GNU (gnulink),
+IRIX (sgilink) and Sun (sunlink) linkers.
+Ignored on platforms and toolchains that don't support it.
+Note that the paths added to RPATH
+are not transformed by
+.B scons
+in any way:  if you want an absolute
+path, you must make it absolute yourself.
+
+.IP RPATHPREFIX
+The prefix used to specify a directory to be searched for
+shared libraries when running programs.
+This will be appended to the beginning of each directory
+in the \fB$RPATH\fP construction variable
+when the \fB$_RPATH\fP variable is automatically generated.
+
+.IP RPATHSUFFIX
+The suffix used to specify a directory to be searched for
+shared libraries when running programs.
+This will be appended to the end of each directory
+in the \fB$RPATH\fP construction variable
+when the \fB$_RPATH\fP variable is automatically generated.
+
+.IP RPCGEN
+The RPC protocol compiler.
+
+.IP RPCGENCLIENTFLAGS
+Options passed to the RPC protocol compiler
+when generating client side stubs.
+These are in addition to any flags specified in the
+.B $RPCGENFLAGS
+construction variable.
+
+.IP RPCGENFLAGS
+General options passed to the RPC protocol compiler.
+
+.IP RPCGENHEADERFLAGS
+Options passed to the RPC protocol compiler
+when generating a header file.
+These are in addition to any flags specified in the
+.B $RPCGENFLAGS
+construction variable.
+
+.IP RPCGENSERVICEFLAGS
+Options passed to the RPC protocol compiler
+when generating server side stubs.
+These are in addition to any flags specified in the
+.B $RPCGENFLAGS
+construction variable.
+
+.IP RPCGENXDRFLAGS
+Options passed to the RPC protocol compiler
+when generating XDR routines.
+These are in addition to any flags specified in the
+.B $RPCGENFLAGS
+construction variable.
+
+.IP SCANNERS
+A list of the available implicit dependency scanners.
+New file scanners may be added by
+appending to this list,
+although the more flexible approach
+is to associate scanners
+with a specific Builder.
+See the sections "Builder Objects"
+and "Scanner Objects,"
+below, for more information.
+
+.IP SCCS
+The SCCS executable.
+
+.IP SCCSCOM
+The command line used to
+fetch source files from SCCS.
+
+.IP SCCSCOMSTR
+The string displayed when fetching
+a source file from a CVS repository.
+If this is not set, then \fB$SCCSCOM\fP
+(the command line) is displayed.
+
+.IP SCCSFLAGS
+General options that are passed to SCCS.
+
+.IP SCCSGETFLAGS
+Options that are passed specifically to the SCCS "get" subcommand.
+This can be set, for example, to
+.B \-e
+to check out editable files from SCCS.
+
+.IP SCONS_HOME
+The (optional) path to the SCons library directory,
+initialized from the external environment.
+If set, this is used to construct a shorter and more
+efficient search path in the
+.B $MSVSSCONS
+command line executed
+from Microsoft Visual Studio project files.
+
+.IP SHCC
+The C compiler used for generating shared-library objects.
+
+.IP SHCCCOM
+The command line used to compile a C source file
+to a shared-library object file.
+Any options specified in the \fB$SHCFLAGS\fP,
+\fB$SHCCFLAGS\fP and
+\fB$CPPFLAGS\fP construction variables
+are included on this command line.
+
+.IP SHCCCOMSTR
+The string displayed when a C source file
+is compiled to a shared object file.
+If this is not set, then \fB$SHCCCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(SHCCCOMSTR = "Compiling shared object $TARGET")
+.EE
+
+.IP SHCCFLAGS
+Options that are passed to the C and C++ compilers
+to generate shared-library objects.
+
+.IP SHCFLAGS
+Options that are passed to the C compiler (only; not C++)
+to generate shared-library objects.
+
+.IP SHCXX
+The C++ compiler used for generating shared-library objects.
+
+.IP SHCXXCOM
+The command line used to compile a C++ source file
+to a shared-library object file.
+Any options specified in the \fB$SHCXXFLAGS\fP and
+\fB$CPPFLAGS\fP construction variables
+are included on this command line.
+
+.IP SHCXXCOMSTR
+The string displayed when a C++ source file
+is compiled to a shared object file.
+If this is not set, then \fB$SHCXXCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(SHCXXCOMSTR = "Compiling shared object $TARGET")
+.EE
+
+.IP SHCXXFLAGS
+Options that are passed to the C++ compiler
+to generate shared-library objects.
+
+.IP SHELL
+A string naming the shell program that will be passed to the
+.B $SPAWN
+function.
+See the
+.B $SPAWN
+construction variable for more information.
+
+.IP SHF77
+The Fortran 77 compiler used for generating shared-library objects.
+You should normally set the \fB$SHFORTRAN\fP variable,
+which specifies the default Fortran compiler
+for all Fortran versions.
+You only need to set \fB$SHF77\fP if you need to use a specific compiler
+or compiler version for Fortran 77 files.
+
+.IP SHF77COM
+The command line used to compile a Fortran 77 source file
+to a shared-library object file.
+You only need to set \fB$SHF77COM\fP if you need to use a specific
+command line for Fortran 77 files.
+You should normally set the \fB$SHFORTRANCOM\fP variable,
+which specifies the default command line
+for all Fortran versions.
+
+.IP SHF77COMSTR
+The string displayed when a Fortran 77 source file
+is compiled to a shared-library object file.
+If this is not set, then \fB$SHF77COM\fP or \fB$SHFORTRANCOM\fP
+(the command line) is displayed.
+
+.IP SHF77FLAGS
+Options that are passed to the Fortran 77 compiler
+to generated shared-library objects.
+You only need to set \fB$SHF77FLAGS\fP if you need to define specific
+user options for Fortran 77 files.
+You should normally set the \fB$SHFORTRANFLAGS\fP variable,
+which specifies the user-specified options
+passed to the default Fortran compiler
+for all Fortran versions.
+
+.IP SHF77PPCOM
+The command line used to compile a Fortran 77 source file to a
+shared-library object file
+after first running the file through the C preprocessor.
+Any options specified in the \fB$SHF77FLAGS\fP and \fB$CPPFLAGS\fP construction variables
+are included on this command line.
+You only need to set \fB$SHF77PPCOM\fP if you need to use a specific
+C-preprocessor command line for Fortran 77 files.
+You should normally set the \fB$SHFORTRANPPCOM\fP variable,
+which specifies the default C-preprocessor command line
+for all Fortran versions.
+
+.IP SHF77PPCOMSTR
+The string displayed when a Fortran 77 source file
+is compiled to a shared-library object file
+after first running the file through the C preprocessor.
+If this is not set, then \fB$SHF77PPCOM\fP or \fB$SHFORTRANPPCOM\fP
+(the command line) is displayed.
+
+.IP SHF90
+The Fortran 90 compiler used for generating shared-library objects.
+You should normally set the \fB$SHFORTRAN\fP variable,
+which specifies the default Fortran compiler
+for all Fortran versions.
+You only need to set \fB$SHF90\fP if you need to use a specific compiler
+or compiler version for Fortran 90 files.
+
+.IP SHF90COM
+The command line used to compile a Fortran 90 source file
+to a shared-library object file.
+You only need to set \fB$SHF90COM\fP if you need to use a specific
+command line for Fortran 90 files.
+You should normally set the \fB$SHFORTRANCOM\fP variable,
+which specifies the default command line
+for all Fortran versions.
+
+.IP SHF90COMSTR
+The string displayed when a Fortran 90 source file
+is compiled to a shared-library object file.
+If this is not set, then \fB$SHF90COM\fP or \fB$SHFORTRANCOM\fP
+(the command line) is displayed.
+
+.IP SHF90FLAGS
+Options that are passed to the Fortran 90 compiler
+to generated shared-library objects.
+You only need to set \fB$SHF90FLAGS\fP if you need to define specific
+user options for Fortran 90 files.
+You should normally set the \fB$SHFORTRANFLAGS\fP variable,
+which specifies the user-specified options
+passed to the default Fortran compiler
+for all Fortran versions.
+
+.IP SHF90PPCOM
+The command line used to compile a Fortran 90 source file to a
+shared-library object file
+after first running the file through the C preprocessor.
+Any options specified in the \fB$SHF90FLAGS\fP and \fB$CPPFLAGS\fP construction variables
+are included on this command line.
+You only need to set \fB$SHF90PPCOM\fP if you need to use a specific
+C-preprocessor command line for Fortran 90 files.
+You should normally set the \fB$SHFORTRANPPCOM\fP variable,
+which specifies the default C-preprocessor command line
+for all Fortran versions.
+
+.IP SHF90PPCOMSTR
+The string displayed when a Fortran 90 source file
+is compiled to a shared-library object file
+after first running the file through the C preprocessor.
+If this is not set, then \fB$SHF90PPCOM\fP or \fB$SHFORTRANPPCOM\fP
+(the command line) is displayed.
+
+.IP SHF95
+The Fortran 95 compiler used for generating shared-library objects.
+You should normally set the \fB$SHFORTRAN\fP variable,
+which specifies the default Fortran compiler
+for all Fortran versions.
+You only need to set \fB$SHF95\fP if you need to use a specific compiler
+or compiler version for Fortran 95 files.
+
+.IP SHF95COM
+The command line used to compile a Fortran 95 source file
+to a shared-library object file.
+You only need to set \fB$SHF95COM\fP if you need to use a specific
+command line for Fortran 95 files.
+You should normally set the \fB$SHFORTRANCOM\fP variable,
+which specifies the default command line
+for all Fortran versions.
+
+.IP SHF95COMSTR
+The string displayed when a Fortran 95 source file
+is compiled to a shared-library object file.
+If this is not set, then \fB$SHF95COM\fP or \fB$SHFORTRANCOM\fP
+(the command line) is displayed.
+
+.IP SHF95FLAGS
+Options that are passed to the Fortran 95 compiler
+to generated shared-library objects.
+You only need to set \fB$SHF95FLAGS\fP if you need to define specific
+user options for Fortran 95 files.
+You should normally set the \fB$SHFORTRANFLAGS\fP variable,
+which specifies the user-specified options
+passed to the default Fortran compiler
+for all Fortran versions.
+
+.IP SHF95PPCOM
+The command line used to compile a Fortran 95 source file to a
+shared-library object file
+after first running the file through the C preprocessor.
+Any options specified in the \fB$SHF95FLAGS\fP and \fB$CPPFLAGS\fP construction variables
+are included on this command line.
+You only need to set \fB$SHF95PPCOM\fP if you need to use a specific
+C-preprocessor command line for Fortran 95 files.
+You should normally set the \fB$SHFORTRANPPCOM\fP variable,
+which specifies the default C-preprocessor command line
+for all Fortran versions.
+
+.IP SHF95PPCOMSTR
+The string displayed when a Fortran 95 source file
+is compiled to a shared-library object file
+after first running the file through the C preprocessor.
+If this is not set, then \fB$SHF95PPCOM\fP or \fB$SHFORTRANPPCOM\fP
+(the command line) is displayed.
+
+.IP SHFORTRAN
+The default Fortran compiler used for generating shared-library objects.
+
+.IP SHFORTRANCOM
+The command line used to compile a Fortran source file
+to a shared-library object file.
+
+.IP SHFORTRANCOMSTR
+The string displayed when a Fortran source file
+is compiled to a shared-library object file.
+If this is not set, then \fB$SHFORTRANCOM\fP
+(the command line) is displayed.
+
+.IP SHFORTRANFLAGS
+Options that are passed to the Fortran compiler
+to generate shared-library objects.
+
+.IP SHFORTRANPPCOM
+The command line used to compile a Fortran source file to a
+shared-library object file
+after first running the file through the C preprocessor.
+Any options specified
+in the \fB$SHFORTRANFLAGS\fP and
+\fB$CPPFLAGS\fP construction variables
+are included on this command line.
+
+.IP SHFORTRANPPCOMSTR
+The string displayed when a Fortran source file
+is compiled to a shared-library object file
+after first running the file through the C preprocessor.
+If this is not set, then \fB$SHFORTRANPPCOM\fP
+(the command line) is displayed.
+
+.IP SHLIBEMITTER
+TODO
+
+.IP SHLIBPREFIX
+The prefix used for shared library file names.
+
+.IP SHLIBSUFFIX
+The suffix used for shared library file names.
+
+.IP SHLIBVERSION
+When this construction variable is defined, a versioned shared library
+is created. This modifies the \fB$SHLINKFLAGS\fP as required, adds
+the version number to the library name, and creates the symlinks that
+are needed. \fB$SHLIBVERSION\fP needs to be of the form X.Y.Z,
+where X and Y are numbers, and Z is a number but can also contain
+letters to designate alpha, beta, or release candidate patch levels.
+
+.IP SHLINK
+The linker for programs that use shared libraries.
+
+.IP SHLINKCOM
+The command line used to link programs using shared libraries.
+
+.IP SHLINKCOMSTR
+The string displayed when programs using shared libraries are linked.
+If this is not set, then \fB$SHLINKCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(SHLINKCOMSTR = "Linking shared $TARGET")
+.EE
+
+.IP SHLINKFLAGS
+General user options passed to the linker for programs using shared libraries.
+Note that this variable should
+.I not
+contain
+.B \-l
+(or similar) options for linking with the libraries listed in \fB$LIBS\fP,
+nor
+.B \-L
+(or similar) include search path options
+that scons generates automatically from \fB$LIBPATH\fP.
+See
+.B $_LIBFLAGS
+above,
+for the variable that expands to library-link options,
+and
+.B $_LIBDIRFLAGS
+above,
+for the variable that expands to library search path options.
+
+.IP SHOBJPREFIX
+The prefix used for shared object file names.
+
+.IP SHOBJSUFFIX
+The suffix used for shared object file names.
+
+.IP SOURCE
+A reserved variable name
+that may not be set or used in a construction environment.
+(See "Variable Substitution," below.)
+
+.IP SOURCE_URL
+The URL
+(web address)
+of the location from which the project was retrieved.
+This is used to fill in the
+.B Source:
+field in the controlling information for Ipkg and RPM packages.
+
+.IP SOURCES
+A reserved variable name
+that may not be set or used in a construction environment.
+(See "Variable Substitution," below.)
+
+.IP SPAWN
+A command interpreter function that will be called to execute command line
+strings. The function must expect the following arguments:
+
+.ES
+def spawn(shell, escape, cmd, args, env):
+.EE
+.IP
+.I sh
+is a string naming the shell program to use.
+.I escape
+is a function that can be called to escape shell special characters in
+the command line.
+.I cmd
+is the path to the command to be executed.
+.I args
+is the arguments to the command.
+.I env
+is a dictionary of the environment variables
+in which the command should be executed.
+
+.IP SUBST_DICT
+The dictionary used by the \fBSubstfile\fP() or \fBTextfile\fP() builders
+for substitution values.
+It can be anything acceptable to the dict() constructor,
+so in addition to a dictionary,
+lists of tuples are also acceptable.
+
+.IP SUBSTFILEPREFIX
+The prefix used for \fBSubstfile\fP() file names,
+the null string by default.
+
+.IP SUBSTFILESUFFIX
+The suffix used for \fBSubstfile\fP() file names,
+the null string by default.
+
+.IP SUMMARY
+A short summary of what the project is about.
+This is used to fill in the
+.B Summary:
+field in the controlling information for Ipkg and RPM packages,
+and as the
+.B Description:
+field in MSI packages.
+
+.IP SWIG
+The scripting language wrapper and interface generator.
+
+.IP SWIGCFILESUFFIX
+The suffix that will be used for intermediate C
+source files generated by
+the scripting language wrapper and interface generator.
+The default value is
+.BR _wrap\fP\fB$CFILESUFFIX .
+By default, this value is used whenever the
+.B \-c++
+option is
+.I not
+specified as part of the
+.B $SWIGFLAGS
+construction variable.
+
+.IP SWIGCOM
+The command line used to call
+the scripting language wrapper and interface generator.
+
+.IP SWIGCOMSTR
+The string displayed when calling
+the scripting language wrapper and interface generator.
+If this is not set, then \fB$SWIGCOM\fP (the command line) is displayed.
+
+.IP SWIGCXXFILESUFFIX
+The suffix that will be used for intermediate C++
+source files generated by
+the scripting language wrapper and interface generator.
+The default value is
+.BR _wrap\fP\fB$CFILESUFFIX .
+By default, this value is used whenever the
+.B \-c++
+option is specified as part of the
+.B $SWIGFLAGS
+construction variable.
+
+.IP SWIGDIRECTORSUFFIX
+The suffix that will be used for intermediate C++ header
+files generated by the scripting language wrapper and interface generator.
+These are only generated for C++ code when the SWIG 'directors' feature is
+turned on.
+The default value is
+.BR _wrap.h .
+
+.IP SWIGFLAGS
+General options passed to
+the scripting language wrapper and interface generator.
+This is where you should set
+.BR \-python ,
+.BR \-perl5 ,
+.BR \-tcl ,
+or whatever other options you want to specify to SWIG.
+If you set the
+.B \-c++
+option in this variable,
+.B scons
+will, by default,
+generate a C++ intermediate source file
+with the extension that is specified as the
+.B $CXXFILESUFFIX
+variable.
+
+.IP _SWIGINCFLAGS
+An automatically-generated construction variable
+containing the SWIG command-line options
+for specifying directories to be searched for included files.
+The value of \fB$_SWIGINCFLAGS\fP is created
+by appending \fB$SWIGINCPREFIX\fP and \fB$SWIGINCSUFFIX\fP
+to the beginning and end
+of each directory in \fB$SWIGPATH\fP.
+
+.IP SWIGINCPREFIX
+The prefix used to specify an include directory on the SWIG command line.
+This will be appended to the beginning of each directory
+in the \fB$SWIGPATH\fP construction variable
+when the \fB$_SWIGINCFLAGS\fP variable is automatically generated.
+
+.IP SWIGINCSUFFIX
+The suffix used to specify an include directory on the SWIG command line.
+This will be appended to the end of each directory
+in the \fB$SWIGPATH\fP construction variable
+when the \fB$_SWIGINCFLAGS\fP variable is automatically generated.
+
+.IP SWIGOUTDIR
+Specifies the output directory in which
+the scripting language wrapper and interface generator
+should place generated language-specific files.
+This will be used by SCons to identify
+the files that will be generated by the &swig; call,
+and translated into the
+\fBswig -outdir\fP option on the command line.
+
+.IP SWIGPATH
+The list of directories that the scripting language wrapper
+and interface generate will search for included files.
+The SWIG implicit dependency scanner will search these
+directories for include files.
+The default is to use the same path
+specified as \fB$CPPPATH\fP.
+
+Don't explicitly put include directory
+arguments in SWIGFLAGS;
+the result will be non-portable
+and the directories will not be searched by the dependency scanner.
+Note: directory names in SWIGPATH will be looked-up relative to the SConscript
+directory when they are used in a command.
+To force
+.B scons
+to look-up a directory relative to the root of the source tree use #:
+
+.ES
+env = Environment(SWIGPATH='#/include')
+.EE
+.IP
+The directory look-up can also be forced using the
+.BR Dir ()
+function:
+
+.ES
+include = Dir('include')
+env = Environment(SWIGPATH=include)
+.EE
+.IP
+The directory list will be added to command lines
+through the automatically-generated
+.B $_SWIGINCFLAGS
+construction variable,
+which is constructed by
+appending the values of the
+.BR $SWIGINCPREFIX  and  $SWIGINCSUFFIX
+construction variables
+to the beginning and end
+of each directory in \fB$SWIGPATH\fP.
+Any command lines you define that need
+the SWIGPATH directory list should
+include \fB$_SWIGINCFLAGS\fP:
+
+.ES
+env = Environment(SWIGCOM="my_swig -o $TARGET $_SWIGINCFLAGS $SORUCES")
+.EE
+
+.IP SWIGVERSION
+The version number of the SWIG tool.
+
+.IP TAR
+The tar archiver.
+
+.IP TARCOM
+The command line used to call the tar archiver.
+
+.IP TARCOMSTR
+The string displayed when archiving files
+using the tar archiver.
+If this is not set, then \fB$TARCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(TARCOMSTR = "Archiving $TARGET")
+.EE
+
+.IP TARFLAGS
+General options passed to the tar archiver.
+
+.IP TARGET
+A reserved variable name
+that may not be set or used in a construction environment.
+(See "Variable Substitution," below.)
+
+.IP TARGET_ARCH
+Sets the target architecture for Visual Studio compiler (i.e. the arch
+of the binaries generated by the compiler). If not set, default to
+\fB$HOST_ARCH\fP, or, if that is unset, to the architecture of the
+running machine's OS (note that the python build or architecture has no
+effect).
+This variable must be passed as an argument to the Environment()
+constructor; setting it later has no effect.  
+This is currently only used on Windows, but in the future it will be
+used on other OSes as well.
+
+Valid values for Windows are
+.BR x86 ,
+.B i386
+(for 32 bits); 
+.BR amd64 ,
+.BR emt64 ,
+.B x86_64
+(for 64 bits);
+and \fBia64\fP (Itanium).
+For example, if you want to compile 64-bit binaries, you would set
+\fBTARGET_ARCH='x86_64'\fP in your SCons environment.
+
+.IP TARGET_OS
+        The name of the target operating system for the compiled objects
+        created by this Environment.
+        This defaults to the value of HOST_OS, and the user can override it.
+        Currently only set for Win32.
+    
+.IP TARGETS
+A reserved variable name
+that may not be set or used in a construction environment.
+(See "Variable Substitution," below.)
+
+.IP TARSUFFIX
+The suffix used for tar file names.
+
+.IP TEMPFILEPREFIX
+The prefix for a temporary file used
+to execute lines longer than $MAXLINELENGTH.
+The default is '@'.
+This may be set for toolchains that use other values,
+such as '-@' for the diab compiler
+or '-via' for ARM toolchain.
+
+.IP TEX
+The TeX formatter and typesetter.
+
+.IP TEXCOM
+The command line used to call the TeX formatter and typesetter.
+
+.IP TEXCOMSTR
+The string displayed when calling
+the TeX formatter and typesetter.
+If this is not set, then \fB$TEXCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(TEXCOMSTR = "Building $TARGET from TeX input $SOURCES")
+.EE
+
+.IP TEXFLAGS
+General options passed to the TeX formatter and typesetter.
+
+.IP TEXINPUTS
+List of directories that the LaTeX program will search
+for include directories.
+The LaTeX implicit dependency scanner will search these
+directories for \\include and \\import files.
+
+.IP TEXTFILEPREFIX
+The prefix used for \fBTextfile\fP() file names,
+the null string by default.
+
+.IP TEXTFILESUFFIX
+The suffix used for \fBTextfile\fP() file names;
+\fB.txt\fP by default.
+
+.IP TOOLS
+A list of the names of the Tool specifications
+that are part of this construction environment.
+
+.IP UNCHANGED_SOURCES
+A reserved variable name
+that may not be set or used in a construction environment.
+(See "Variable Substitution," below.)
+
+.IP UNCHANGED_TARGETS
+A reserved variable name
+that may not be set or used in a construction environment.
+(See "Variable Substitution," below.)
+
+.IP VENDOR
+The person or organization who supply the packaged software.
+This is used to fill in the
+.B Vendor:
+field in the controlling information for RPM packages,
+and the
+.B Manufacturer:
+field in the controlling information for MSI packages.
+
+.IP VERSION
+The version of the project, specified as a string.
+
+.IP WIN32_INSERT_DEF
+A deprecated synonym for \fB$WINDOWS_INSERT_DEF\fP.
+
+.IP WIN32DEFPREFIX
+A deprecated synonym for \fB$WINDOWSDEFPREFIX\fP.
+
+.IP WIN32DEFSUFFIX
+A deprecated synonym for \fB$WINDOWSDEFSUFFIX\fP.
+
+.IP WIN32EXPPREFIX
+A deprecated synonym for \fB$WINDOWSEXPSUFFIX\fP.
+
+.IP WIN32EXPSUFFIX
+A deprecated synonym for \fB$WINDOWSEXPSUFFIX\fP.
+
+.IP WINDOWS_EMBED_MANIFEST
+Set this variable to True or 1 to embed the compiler-generated manifest
+(normally \fB${TARGET}.manifest\fP)
+into all Windows exes and DLLs built with this environment,
+as a resource during their link step.
+This is done using \fB$MT\fP and \fB$MTEXECOM\fP and \fB$MTSHLIBCOM\fP.
+
+.IP WINDOWS_INSERT_DEF
+When this is set to true,
+a library build of a Windows shared library
+(\fB.dll\fP file)
+will also build a corresponding \fB.def\fP file
+at the same time,
+if a \fB.def\fP file
+is not already listed as a build target.
+The default is 0 (do not build a \fB.def\fP file).
+
+.IP WINDOWS_INSERT_MANIFEST
+When this is set to true,
+.B scons
+will be aware of the
+.B .manifest
+files generated by Microsoft Visua C/C++ 8.
+
+.IP WINDOWSDEFPREFIX
+The prefix used for Windows \fB.def\fP file names.
+
+.IP WINDOWSDEFSUFFIX
+The suffix used for Windows \fB.def\fP file names.
+
+.IP WINDOWSEXPPREFIX
+The prefix used for Windows \fB.exp\fP file names.
+
+.IP WINDOWSEXPSUFFIX
+The suffix used for Windows \fB.exp\fP file names.
+
+.IP WINDOWSPROGMANIFESTPREFIX
+The prefix used for executable program \fB.manifest\fP files
+generated by Microsoft Visual C/C++.
+
+.IP WINDOWSPROGMANIFESTSUFFIX
+The suffix used for executable program \fB.manifest\fP files
+generated by Microsoft Visual C/C++.
+
+.IP WINDOWSSHLIBMANIFESTPREFIX
+The prefix used for shared library \fB.manifest\fP files
+generated by Microsoft Visual C/C++.
+
+.IP WINDOWSSHLIBMANIFESTSUFFIX
+The suffix used for shared library \fB.manifest\fP files
+generated by Microsoft Visual C/C++.
+
+.IP X_IPK_DEPENDS
+This is used to fill in the
+.B Depends:
+field in the controlling information for Ipkg packages.
+
+.IP X_IPK_DESCRIPTION
+This is used to fill in the
+.B Description:
+field in the controlling information for Ipkg packages.
+The default value is
+.B "$SUMMARY\\n$DESCRIPTION"
+.IP X_IPK_MAINTAINER
+This is used to fill in the
+.B Maintainer:
+field in the controlling information for Ipkg packages.
+
+.IP X_IPK_PRIORITY
+This is used to fill in the
+.B Priority:
+field in the controlling information for Ipkg packages.
+
+.IP X_IPK_SECTION
+This is used to fill in the
+.B Section:
+field in the controlling information for Ipkg packages.
+
+.IP X_MSI_LANGUAGE
+This is used to fill in the
+.B Language:
+attribute in the controlling information for MSI packages.
+
+.IP X_MSI_LICENSE_TEXT
+The text of the software license in RTF format.
+Carriage return characters will be
+replaced with the RTF equivalent \\\\par.
+
+.IP X_MSI_UPGRADE_CODE
+TODO
+
+.IP X_RPM_AUTOREQPROV
+This is used to fill in the
+.B AutoReqProv:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_BUILD
+internal, but overridable
+
+.IP X_RPM_BUILDREQUIRES
+This is used to fill in the
+.B BuildRequires:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_BUILDROOT
+internal, but overridable
+
+.IP X_RPM_CLEAN
+internal, but overridable
+
+.IP X_RPM_CONFLICTS
+This is used to fill in the
+.B Conflicts:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_DEFATTR
+This value is used as the default attributes
+for the files in the RPM package.
+The default value is
+.BR (-,root,root) .
+
+.IP X_RPM_DISTRIBUTION
+This is used to fill in the
+.B Distribution:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_EPOCH
+This is used to fill in the
+.B Epoch:
+field in the controlling information for RPM packages.
+
+.IP X_RPM_EXCLUDEARCH
+This is used to fill in the
+.B ExcludeArch:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_EXLUSIVEARCH
+This is used to fill in the
+.B ExclusiveArch:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_GROUP
+This is used to fill in the
+.B Group:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_GROUP_lang
+This is used to fill in the
+.B Group(lang):
+field in the RPM
+\fB.spec\fP file.
+Note that
+.I lang
+is not literal
+and should be replaced by
+the appropriate language code.
+
+.IP X_RPM_ICON
+This is used to fill in the
+.B Icon:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_INSTALL
+internal, but overridable
+
+.IP X_RPM_PACKAGER
+This is used to fill in the
+.B Packager:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_POSTINSTALL
+This is used to fill in the
+.B %post:
+section in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_POSTUNINSTALL
+This is used to fill in the
+.B %postun:
+section in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_PREFIX
+This is used to fill in the
+.B Prefix:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_PREINSTALL
+This is used to fill in the
+.B %pre:
+section in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_PREP
+internal, but overridable
+
+.IP X_RPM_PREUNINSTALL
+This is used to fill in the
+.B %preun:
+section in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_PROVIDES
+This is used to fill in the
+.B Provides:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_REQUIRES
+This is used to fill in the
+.B Requires:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_SERIAL
+This is used to fill in the
+.B Serial:
+field in the RPM
+\fB.spec\fP file.
+
+.IP X_RPM_URL
+This is used to fill in the
+.B Url:
+field in the RPM
+\fB.spec\fP file.
+
+.IP XGETTEXT
+Path to \fBxgettext(1)\fP program (found via
+.BR Detect() ).
+See &t-link-xgettext; tool and \fBPOTUpdate\fP() builder.
+
+.IP XGETTEXTCOM
+Complete xgettext command line.
+See &t-link-xgettext; tool and \fBPOTUpdate\fP() builder.
+
+.IP XGETTEXTCOMSTR
+A string that is shown when \fBxgettext(1)\fP command is invoked
+(default: \fB''\fP, which means "print \fB$XGETTEXTCOM\fP").
+See &t-link-xgettext; tool and \fBPOTUpdate\fP() builder.
+
+.IP _XGETTEXTDOMAIN
+Internal "macro". Generates \fBxgettext\fP domain name
+form source and target (default: \fB'${TARGET.filebase}'\fP).
+
+.IP XGETTEXTFLAGS
+Additional flags to \fBxgettext(1)\fP.
+See &t-link-xgettext; tool and \fBPOTUpdate\fP() builder.
+
+.IP XGETTEXTFROM
+Name of file containing list of \fBxgettext(1)\fP's source
+files. Autotools' users know this as \fBPOTFILES.in\fP so they
+will in most cases set \fBXGETTEXTFROM="POTFILES.in"\fP here.
+The \fB$XGETTEXTFROM\fP files have same syntax and semantics as the well known
+GNU \fBPOTFILES.in\fP.
+See &t-link-xgettext; tool and \fBPOTUpdate\fP() builder.
+
+.IP _XGETTEXTFROMFLAGS
+Internal "macro". Genrates list of \fB\-D<dir>\fP flags
+from the \fB$XGETTEXTPATH\fP list.
+
+.IP XGETTEXTFROMPREFIX
+This flag is used to add single \fB$XGETTEXTFROM\fP file to
+\fBxgettext(1)\fP's commandline (default:
+.BR '-f' ).
+
+.IP XGETTEXTFROMSUFFIX
+(default: \fB''\fP)
+
+.IP XGETTEXTPATH
+List of directories, there \fBxgettext(1)\fP will look for
+source files (default: \fB[]\fP).
+<note>This variable works only together with \fB$XGETTEXTFROM\fP
+</para></note>
+See also &t-link-xgettext; tool and \fBPOTUpdate\fP() builder.
+
+.IP _XGETTEXTPATHFLAGS
+Internal "macro". Generates list of \fB\-f<file>\fP flags
+from \fB$XGETTEXTFROM\fP.
+
+.IP XGETTEXTPATHPREFIX
+This flag is used to add single search path to
+\fBxgettext(1)\fP's commandline (default:
+.BR '-D' ).
+
+.IP XGETTEXTPATHSUFFIX
+(default: \fB''\fP)
+
+.IP YACC
+The parser generator.
+
+.IP YACCCOM
+The command line used to call the parser generator
+to generate a source file.
+
+.IP YACCCOMSTR
+The string displayed when generating a source file
+using the parser generator.
+If this is not set, then \fB$YACCCOM\fP (the command line) is displayed.
+
+.ES
+env = Environment(YACCCOMSTR = "Yacc'ing $TARGET from $SOURCES")
+.EE
+
+.IP YACCFLAGS
+General options passed to the parser generator.
+If \fB$YACCFLAGS\fP contains a \fB\-d\fP option,
+SCons assumes that the call will also create a .h file
+(if the yacc source file ends in a .y suffix)
+or a .hpp file
+(if the yacc source file ends in a .yy suffix)
+
+.IP YACCHFILESUFFIX
+The suffix of the C
+header file generated by the parser generator
+when the
+.B \-d
+option is used.
+Note that setting this variable does not cause
+the parser generator to generate a header
+file with the specified suffix,
+it exists to allow you to specify
+what suffix the parser generator will use of its own accord.
+The default value is
+.BR .h .
+
+.IP YACCHXXFILESUFFIX
+The suffix of the C++
+header file generated by the parser generator
+when the
+.B \-d
+option is used.
+Note that setting this variable does not cause
+the parser generator to generate a header
+file with the specified suffix,
+it exists to allow you to specify
+what suffix the parser generator will use of its own accord.
+The default value is
+.BR .hpp ,
+except on Mac OS X,
+where the default is
+.BR ${TARGET.suffix}.h .
+because the default &bison; parser generator just
+appends \fB.h\fP
+to the name of the generated C++ file.
+
+.IP YACCVCGFILESUFFIX
+The suffix of the file
+containing the VCG grammar automaton definition
+when the
+.B \-\-graph=
+option is used.
+Note that setting this variable does not cause
+the parser generator to generate a VCG
+file with the specified suffix,
+it exists to allow you to specify
+what suffix the parser generator will use of its own accord.
+The default value is
+.BR .vcg .
+
+.IP ZIP
+The zip compression and file packaging utility.
+
+.IP ZIPCOM
+The command line used to call the zip utility,
+or the internal Python function used to create a
+zip archive.
+
+.IP ZIPCOMPRESSION
+The
+.I compression
+flag
+from the Python
+.B zipfile
+module used by the internal Python function
+to control whether the zip archive
+is compressed or not.
+The default value is
+.BR zipfile.ZIP_DEFLATED ,
+which creates a compressed zip archive.
+This value has no effect if the
+.B zipfile
+module is unavailable.
+
+.IP ZIPCOMSTR
+The string displayed when archiving files
+using the zip utility.
+If this is not set, then \fB$ZIPCOM\fP
+(the command line or internal Python function) is displayed.
+
+.ES
+env = Environment(ZIPCOMSTR = "Zipping $TARGET")
+.EE
+
+.IP ZIPFLAGS
+General options passed to the zip utility.
+
+.IP ZIPSUFFIX
+The suffix used for zip file names.
